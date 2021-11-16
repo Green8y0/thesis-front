@@ -7,8 +7,8 @@ function initFontSize() {
   const doc = document.documentElement
   const width = doc.clientWidth
   const ratio = width / 375
-  let fontSize = 75 * ratio
-  if (fontSize > 150) fontSize = 150
+  let fontSize = 10 * ratio
+  if (fontSize > 20) fontSize = 20
   doc.style.fontSize = fontSize + 'px'
 }
 initFontSize()

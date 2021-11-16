@@ -1,33 +1,33 @@
 import request, { BaseRes } from '../libs/request'
-import { SearchType, IRooms, ISku } from '../models/types'
+import { SearchType, IRooms } from '../models/types'
 
 // API路径前缀
-// const PREFIX = '/api/v1/rooms'
-const PREFIX = '/api/v1/sku'
+const PREFIX = '/api/v1/rooms'
+// const PREFIX = '/api/v1/sku'
 
 interface ListData<T> {
   rows: T[]
 }
 
 interface ISearch extends SearchType {
-  roomsId?: string
+  roomsIds?: string[]
   name?: string
-  creatorId?: string
+  creatorIds?: string[]
 }
 
-export async function search({
-  roomsId,
+export async function list({
+  roomsIds,
   name,
-  creatorId,
+  creatorIds,
   offset,
   limit,
   order
 }: ISearch) {
-  const { data } = await request.post<BaseRes<ListData<ISku>>>(
+  const { data } = await request.post<BaseRes<ListData<IRooms>>>(
     `${PREFIX}/list`, {
-      roomsId,
+      roomsIds,
       name,
-      creatorId,
+      creatorIds,
       offset,
       limit,
       order

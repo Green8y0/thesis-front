@@ -34,7 +34,7 @@ export interface SearchType {
 }
 
 export interface IRooms {
-  roomsId: string // rooms表_id
+  _id: string // rooms表_id
   name: string // 会议室名称
   creatorId: string // 会议室创建者userId
 }

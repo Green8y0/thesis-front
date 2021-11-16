@@ -1,5 +1,5 @@
 {
-  "extends": ["react-app", "standard"],
+  "extends": ["react-app", "standard", "eslint:recommended"],
   "parser": "@typescript-eslint/parser",
   "rules": {
     "camelcase": "off",

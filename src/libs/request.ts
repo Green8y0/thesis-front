@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Toast } from 'antd-mobile'
 
 const instance = axios.create({
   validateStatus: status => {
@@ -8,14 +9,18 @@ const instance = axios.create({
 
 instance.interceptors.response.use(async resp => {
   // 定义响应拦截器
-  if (resp.headers['content-type'].includes('application/json')) {
-    const whitelist = ['/login', '/register']
-    if (
-      resp.data.stat === 'ERR_NOT_LOGIN' &&
-      whitelist.includes(window.location.pathname) === false
-    ) {
-      window.location.href = '/login'
-    }
+  // if (resp.headers['content-type'].includes('application/json')) {
+  //   const whitelist = ['/login', '/register']
+  //   if (
+  //     resp.data.stat === 'ERR_NOT_LOGIN' &&
+  //     whitelist.includes(window.location.pathname) === false
+  //   ) {
+  //     window.location.href = '/login'
+  //   }
+  // }
+  if (resp.status === 401) {
+    Toast.show('用户未登录')
+    window.location.href = '/login'
   }
   return resp
 })

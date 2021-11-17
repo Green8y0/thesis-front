@@ -6,7 +6,6 @@ import { Button, Toast } from 'antd-mobile'
 
 import styles from '../Login/style.module.less'
 import classNames from '@/libs/classNames'
-import InputItem from '@/components/InputItem'
 import { userService } from '@/services'
 
 export default function Register() {
@@ -57,7 +56,7 @@ export default function Register() {
         <UserAddOutlined /> <span className="title">注册</span>
       </div>
       <div className={styles.form}>
-        <InputItem
+        {/* <InputItem
           placeholder="请输入用户名"
           value={username}
           onChange={value => setUsername(value)}
@@ -76,7 +75,7 @@ export default function Register() {
           type="password"
           onChange={value => setCfmPassword(value)}
           icon={<KeyOutlined />}
-        />
+        /> */}
         <Button block size="large" disabled={disabled()} onClick={submit}>
           注册
         </Button>

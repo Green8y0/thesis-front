@@ -44,8 +44,8 @@ export default function Drawer({ user, visible, onClose }: Props) {
         <MenuOutlined onClick={onClose} />
       </div>
       <div className={styles.account}>
-        <img src={user?.avatar} className={styles.avatar} alt="" />
-        <span>{user?.username}</span>
+        {/* <img src={user?.avatar} className={styles.avatar} alt="" /> */}
+        <span>{user?.nickname}</span>
       </div>
       <NavLink
         to="/"

@@ -1,5 +1,5 @@
 import request, { BaseRes } from '../libs/request'
-import { SearchType, IRooms } from '../models/types'
+import { SearchType, IRoom } from '../models/types'
 
 // API路径前缀
 const PREFIX = '/api/v1/rooms'
@@ -23,7 +23,7 @@ export async function list({
   limit,
   order
 }: ISearch) {
-  const { data } = await request.post<BaseRes<ListData<IRooms>>>(
+  const { data } = await request.post<BaseRes<ListData<IRoom>>>(
     `${PREFIX}/list`, {
       roomsIds,
       name,

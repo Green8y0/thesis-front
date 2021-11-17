@@ -5,7 +5,7 @@ import { useRequest } from 'ahooks'
 import { useHistory } from 'react-router-dom'
 
 import styles from './style.module.less'
-import InputItem from '@/components/InputItem'
+// import InputItem from '@/components/InputItem'
 import { userService } from '@/services'
 
 export default function Setting() {
@@ -46,7 +46,7 @@ export default function Setting() {
         <SettingOutlined /> <span className="title">设置</span>
       </header>
       <div className={styles.form}>
-        <InputItem
+        {/* <InputItem
           type="password"
           value={oldValue}
           onChange={value => setOldValue(value)}
@@ -63,7 +63,7 @@ export default function Setting() {
           value={cfmValue}
           onChange={value => setCfmValue(value)}
           placeholder="确认密码"
-        />
+        /> */}
         <Button size="large" block disabled={disabled()} onClick={submit}>
           修改密码
         </Button>

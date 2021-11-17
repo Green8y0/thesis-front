@@ -1,4 +1,4 @@
-import { UserStatus } from './enums'
+import { RoleType } from './enums'
 
 export type PickSome<T, K extends keyof T> = {
   [P in keyof Pick<T, K>]?: T[P]
@@ -9,10 +9,9 @@ export type PickSome<T, K extends keyof T> = {
  */
 export interface IUser {
   _id: string
-  username: string
-  avatar: string
-  status: UserStatus
-  createdAt: number
+  nickname: string
+  phoneNum: string
+  role: RoleType
 }
 
 /**
@@ -33,10 +32,11 @@ export interface SearchType {
   order?: string[]
 }
 
-export interface IRooms {
+export interface IRoom {
   _id: string // rooms表_id
   name: string // 会议室名称
   creatorId: string // 会议室创建者userId
+  location: string
 }
 
 export interface ISku {

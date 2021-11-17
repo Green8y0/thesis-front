@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TabBar } from 'antd-mobile'
 import {
-  AddOutline,
-  AppOutline,
-  UserOutline
-} from 'antd-mobile-icons'
+  HomeOutlined,
+  PlusOutlined,
+  UserOutlined
+} from '@ant-design/icons'
 // import { WritingType } from '@/models/enums'
 import styles from './style.module.less'
 
@@ -16,16 +16,16 @@ export default function PackTabBar() {
     {
       key: 'home',
       title: '主页',
-      icon: <AppOutline className={styles['tabbar-icon']} />
+      icon: <HomeOutlined className={styles['tabbar-icon']} />
     },
     {
-      key: 'writing',
-      icon: <AddOutline className={styles.icon} />
+      key: 'new',
+      icon: <PlusOutlined className={styles.icon} />
     },
     {
       key: 'me',
       title: '我的',
-      icon: <UserOutline className={styles['tabbar-icon']} />
+      icon: <UserOutlined className={styles['tabbar-icon']} />
     }
   ]
 

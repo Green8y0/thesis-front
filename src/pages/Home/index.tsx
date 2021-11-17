@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom'
 import styles from './style.module.less'
 import Setting from '../Setting'
 import Rooms from '../Rooms'
+import Me from '../Me'
 
 export default function Home() {
   return (
@@ -13,14 +14,10 @@ export default function Home() {
       <main className={styles.body}>
         <Switch>
           <Route path="/setting" exact component={Setting} />
+          <Route path="/me" exact component={Me} />
           <Route path="/" exact component={Rooms} />
         </Switch>
       </main>
-      {/* <Drawer
-        visible={visible}
-        user={data?.data.user}
-        onClose={() => setVisible(false)}
-      /> */}
     </div>
   )
 }

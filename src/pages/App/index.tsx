@@ -8,9 +8,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/" component={Home} />
         <Route path="/login" exact component={Login} />
         <Route path="/register" exact component={Register} />
+        <Route path="/" component={Home} />
       </Switch>
     </BrowserRouter>
   )

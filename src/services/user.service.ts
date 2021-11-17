@@ -1,48 +1,35 @@
 import request, { BaseRes } from '../libs/request'
 import { IUser } from '../models/types'
-import axios, { Canceler } from 'axios'
+import { Canceler } from 'axios'
 
 // API路径前缀
 const PREFIX = '/api/v1/user'
 
-interface InfoData {
-  user: IUser
-}
-const CancelToken = axios.CancelToken
 export let loginCancel: Canceler
 
 /**
  * 用户登录
- * @param username
- * @param password
+ * @param phoneNum 手机号
+ * @param code 验证码
  * @returns
  */
-export async function login(username: string, password: string) {
+export async function login(phoneNum: string, code: number) {
   const { data } = await request.post<BaseRes>(
-    PREFIX + '/login',
-    {
-      username,
-      password
-    },
-    {
-      cancelToken: new CancelToken(function executor(cancel) {
-        loginCancel = cancel
-      })
-    }
+    `${PREFIX}/login`, { phoneNum, code }
   )
   return data
 }
 
 /**
  * 用户注册
- * @param username
- * @param password
+ * @param phoneNum 手机号
+ * @param nickname 昵称
  * @returns
  */
-export async function register(username: string, password: string) {
+export async function register(phoneNum: string, nickname?: string) {
   const { data } = await request.post<BaseRes>(PREFIX + '/register', {
-    username,
-    password
+    phoneNum,
+    nickname
   })
   return data
 }
@@ -52,7 +39,7 @@ export async function register(username: string, password: string) {
  * @returns
  */
 export async function info() {
-  const { data } = await request.post<BaseRes<InfoData>>(PREFIX + '/info')
+  const { data } = await request.post<BaseRes<IUser>>(PREFIX + '/info')
   return data
 }
 

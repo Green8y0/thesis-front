@@ -4,9 +4,8 @@ import { Link, useHistory } from 'react-router-dom'
 import {
   Button,
   Toast,
-  Input,
-  Space
-} from 'antd-mobile'
+  Field
+} from 'react-vant'
 
 import classNames from '@/libs/classNames'
 import LoginIconFont from '@/components/Icon/LoginIconFont'
@@ -32,10 +31,10 @@ export default function Login() {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
-        Toast.show('登录成功')
+        Toast.success('登录成功')
         history.push('/')
       } else {
-        Toast.show(data.msg)
+        Toast.fail(data.msg)
       }
     }
   })
@@ -52,7 +51,7 @@ export default function Login() {
         <LoginIconFont/>
       </div>
       <div className={styles.form}>
-        <Input
+        <Field
           placeholder='请输入手机号'
           className={styles.input}
           onChange={val => setPhoneNum(val)}
@@ -60,8 +59,8 @@ export default function Login() {
             '--font-size': '1.5rem'
           }}
         />
-        <Space size='0.5rem'>
-          <Input
+        <div>
+          <Field
             placeholder='请输入验证码'
             className={styles.input}
             onChange={val => setCode(Number(val))}
@@ -74,7 +73,7 @@ export default function Login() {
           >
             发送验证码
           </Button>
-        </Space>
+        </div>
         <Button
           block
           size="large"

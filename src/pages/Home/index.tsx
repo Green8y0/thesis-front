@@ -1,9 +1,8 @@
 import { Switch, Route } from 'react-router-dom'
 
-import styles from './style.module.less'
-import Setting from '../Setting'
 import Rooms from '../Rooms'
 import Me from '../Me'
+import styles from './style.module.less'
 
 export default function Home() {
   return (
@@ -13,7 +12,6 @@ export default function Home() {
       </header>
       <main className={styles.body}>
         <Switch>
-          <Route path="/setting" exact component={Setting} />
           <Route path="/me" exact component={Me} />
           <Route path="/" exact component={Rooms} />
         </Switch>

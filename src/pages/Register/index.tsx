@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useRequest } from 'ahooks'
 import { Link, useHistory } from 'react-router-dom'
-import { UserAddOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
-import { Button, Toast } from 'antd-mobile'
+// import { UserAddOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
+import { Button, Toast } from 'react-vant'
 
 import styles from '../Login/style.module.less'
 import classNames from '@/libs/classNames'
@@ -27,10 +27,10 @@ export default function Register() {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
-        Toast.show('注册成功')
+        Toast.success('注册成功')
         history.push('/login')
       } else {
-        Toast.show(data.msg)
+        Toast.fail(data.msg)
       }
     }
   })
@@ -42,10 +42,10 @@ export default function Register() {
 
   const submit = () => {
     if (password.length < 6) {
-      return Toast.show('密码不能小于6位')
+      return Toast('密码不能小于6位')
     }
     if (password !== cfmPassword) {
-      return Toast.show('两次密码不一致')
+      return Toast('两次密码不一致')
     }
     register(username, password)
   }
@@ -53,7 +53,7 @@ export default function Register() {
   return (
     <div className={classNames('page', styles.wrap)}>
       <div className="header">
-        <UserAddOutlined /> <span className="title">注册</span>
+        {/* <UserAddOutlined /> <span className="title">注册</span> */}
       </div>
       <div className={styles.form}>
         {/* <InputItem

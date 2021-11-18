@@ -1,13 +1,11 @@
 import { useState, useRef } from 'react'
 import { useRequest } from 'ahooks'
-import {
-  InfiniteScroll
-} from 'antd-mobile'
 
 import { roomsService } from '@/services'
 import { IRoom } from '@/models/types'
 import Layout from '@/components/Layout'
-import PullRefresh from '@/components/PullRefresh'
+import PullToRefresh from '@/components/PullToRefresh'
+import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
 
 export default function Rooms() {
@@ -41,15 +39,20 @@ export default function Rooms() {
       showNav={false}
       showTab={true}
     >
-      <PullRefresh
+      <SearchBar
+        placeholder='请输入内容'
+      />
+      <PullToRefresh
         onRefresh={async () => {
           setRooms([])
           setHasMore(true)
         }}
       >
-        <RoomCard rooms={rooms} />
-        <InfiniteScroll loadMore={loadMoreRooms} hasMore={hasMore} />
-      </PullRefresh>
+        <RoomCard rooms={rooms}
+          loadMore={loadMoreRooms}
+          hasMore={hasMore}
+        />
+      </PullToRefresh>
     </Layout>
   )
 }

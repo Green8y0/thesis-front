@@ -1,8 +1,7 @@
 import {
-  Card,
-  Space
-} from 'antd-mobile'
-import { CommentOutlined, RightOutlined } from '@ant-design/icons'
+  Cell,
+  List
+} from 'react-vant'
 
 import LocationIcon from '@/components/Icon/LocationIcon'
 import { IRoom } from '@models/types'
@@ -10,47 +9,43 @@ import styles from './style.module.less'
 
 interface Props {
   rooms: IRoom[]
+  hasMore: boolean
+  loadMore: () => Promise<void>
 }
 
 const CardHeader = ({ item }: {
   item: IRoom
 }) => {
   return (
-    <Space
-      className={styles.header}
-      size='1rem'
-      align='center'
+    <Cell
+      icon='comment-o'
+      value={item.name}
+      isLink
     >
-      <CommentOutlined className={styles.icon} />
-      <div>
-        {item.name}
-      </div>
-    </Space>
+    </Cell>
   )
 }
 
-export default function RoomCard({ rooms }: Props) {
+export default function RoomCard({
+  rooms,
+  hasMore,
+  loadMore
+}: Props) {
   return (
-    <Space direction='vertical' block
-      size='1rem'
-      className={styles.body}
-    >
+    <List finished={!hasMore} onLoad={loadMore}>
       {rooms?.map(item => (
-        <Card
+        <Cell.Group inset
           key={item._id}
           className={styles.card}
-          title={<CardHeader item={item} />}
-          extra={<RightOutlined style={{ fontSize: '1.5rem' }} />}
         >
-          <Space block
-            size='1rem'
-            className={styles.content}
+          <CardHeader item={item} />
+          <Cell
+            icon={<LocationIcon/>}
+            value={item.location}
           >
-            <LocationIcon/>
-            {item.location}
-          </Space>
-        </Card>
+          </Cell>
+        </Cell.Group>
       ))}
-    </Space>
+    </List>
   )
 }

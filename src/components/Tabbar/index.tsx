@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { TabBar } from 'antd-mobile'
-import {
-  HomeOutlined,
-  PlusOutlined,
-  UserOutlined
-} from '@ant-design/icons'
+import { Tabbar } from 'react-vant'
 // import { WritingType } from '@/models/enums'
 import styles from './style.module.less'
 
@@ -16,16 +11,16 @@ export default function PackTabBar() {
     {
       key: 'home',
       title: '主页',
-      icon: <HomeOutlined className={styles['tabbar-icon']} />
+      icon: 'wap-home-o'
     },
     {
       key: 'new',
-      icon: <PlusOutlined className={styles.icon} />
+      icon: 'plus'
     },
     {
       key: 'me',
       title: '我的',
-      icon: <UserOutlined className={styles['tabbar-icon']} />
+      icon: 'user-o'
     }
   ]
 
@@ -57,16 +52,17 @@ export default function PackTabBar() {
   }, [])
 
   return (
-    <TabBar activeKey={activeKey} onChange={onChange}
+    <Tabbar
+      value={activeKey}
+      onChange={() => onChange(activeKey)}
       className={styles.tabbar}
     >
       {tabs.map(item => (
-        <TabBar.Item
+        <Tabbar.Item
           key={item.key}
           icon={item.icon}
-          title={item.title}
-        />
+        >{item.title}</Tabbar.Item>
       ))}
-    </TabBar>
+    </Tabbar>
   )
 }

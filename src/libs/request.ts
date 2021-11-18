@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Toast } from 'antd-mobile'
+import { Toast } from 'react-vant'
 
 const instance = axios.create({
   validateStatus: status => {
@@ -19,7 +19,7 @@ instance.interceptors.response.use(async resp => {
   //   }
   // }
   if (resp.status === 401) {
-    Toast.show('用户未登录')
+    Toast.fail('用户未登录')
     window.location.href = '/login'
   }
   return resp

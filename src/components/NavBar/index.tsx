@@ -1,5 +1,5 @@
 import { useHistory } from 'react-router-dom'
-import { NavBar } from 'antd-mobile'
+import { NavBar } from 'react-vant'
 
 interface Props {
   from?: string
@@ -27,6 +27,6 @@ export default function PackNavBar({
   }
 
   return (
-    <NavBar onBack={onBack} style={{ backgroundColor: '#eeeeed' }}>{title}</NavBar>
+    <NavBar onClickLeft={onBack} style={{ backgroundColor: '#eeeeed' }}>{title}</NavBar>
   )
 }

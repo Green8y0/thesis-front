@@ -20,9 +20,9 @@ module.exports = {
       })
     ]),
     fixBabelImports('import', {
-      libraryName: 'antd-mobile',
-      libraryDirectory: 'es/components',
-      style: false
+      libraryName: 'react-vant',
+      libraryDirectory: 'es',
+      style: true
     })
   )
 }

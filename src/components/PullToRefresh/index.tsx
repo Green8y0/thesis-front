@@ -1,20 +1,20 @@
 import { PropsWithChildren } from 'react'
-import { PullToRefresh } from 'antd-mobile'
+import { PullRefresh } from 'react-vant'
 
 interface Props {
   onRefresh: () => Promise<any>
 }
 
 // 封装下拉刷新
-export default function PullRefresh({
+export default function PullToRefresh({
   children,
   onRefresh
 }: PropsWithChildren<Props>) {
   return (
-    <PullToRefresh
+    <PullRefresh
       onRefresh={onRefresh}
     >
       {children}
-    </PullToRefresh>
+    </PullRefresh>
   )
 }

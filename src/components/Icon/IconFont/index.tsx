@@ -1,7 +1,3 @@
-import { createFromIconfontCN } from '@ant-design/icons'
+import { Icon } from 'react-vant'
 
-export const IconFont = createFromIconfontCN({
-  scriptUrl: [
-    '//at.alicdn.com/t/font_2944246_4ukh2apg20a.js'
-  ]
-})
+export const IconFont = Icon.createFromIconfontCN('//at.alicdn.com/t/font_2944246_4ukh2apg20a.js')

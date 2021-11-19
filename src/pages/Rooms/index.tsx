@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useRequest } from 'ahooks'
+import { Sticky } from 'react-vant'
 
 import { roomsService } from '@/services'
 import { IRoom } from '@/models/types'
@@ -12,6 +13,7 @@ export default function Rooms() {
   const limit = useRef(10)
   const [hasMore, setHasMore] = useState(true)
   const [rooms, setRooms] = useState<IRoom[]>([])
+  const [searchVal, setSearchVal] = useState('')
 
   const { run: loadRooms } = useRequest(roomsService.list, {
     manual: true,
@@ -26,6 +28,8 @@ export default function Rooms() {
   const loadMoreRooms = async () => {
     try {
       await loadRooms({
+        // eslint-disable-next-line no-unneeded-ternary
+        name: searchVal ? searchVal : undefined,
         offset: rooms.length,
         limit: limit.current
       })
@@ -34,14 +38,25 @@ export default function Rooms() {
     }
   }
 
+  const setValue = (val: string) => {
+    setHasMore(true)
+    setRooms([])
+    setSearchVal(val)
+  }
+
   return (
     <Layout
       showNav={false}
       showTab={true}
     >
-      <SearchBar
-        placeholder='请输入内容'
-      />
+      <Sticky>
+        <SearchBar
+          placeholder='请输入内容'
+          value={searchVal}
+          setValue={setValue}
+          onClear={setValue}
+        />
+      </Sticky>
       <PullToRefresh
         onRefresh={async () => {
           setRooms([])

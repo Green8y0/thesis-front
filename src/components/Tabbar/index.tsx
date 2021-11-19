@@ -15,7 +15,8 @@ export default function PackTabBar() {
     },
     {
       key: 'new',
-      icon: 'plus'
+      title: '会议',
+      icon: 'todo-list-o'
     },
     {
       key: 'me',

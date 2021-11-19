@@ -1,7 +1,6 @@
 import {
   Icon,
-  Skeleton,
-  Flex
+  Skeleton
 } from 'react-vant'
 import IdIcon from '@/components/Icon/IdIcon'
 import { IUser } from '@models/types'

@@ -1,5 +1,7 @@
 import {
-  Icon
+  Icon,
+  Skeleton,
+  Flex
 } from 'react-vant'
 import IdIcon from '@/components/Icon/IdIcon'
 import { IUser } from '@models/types'
@@ -13,16 +15,20 @@ export default function UserCard({
   user
 }: Props) {
   return (
-    <div className={styles.all}>
-      <Icon name='user-o' className={styles.icon} />
-      <div className={styles['item-icon']}>
-        <Icon name='user-o' />
-        <div className={styles.nickname}>{user?.nickname}</div>
+    <Skeleton avatar loading={!user}>
+      <div className={styles.all}>
+        <Icon name='user-o' className={styles.icon} />
+        <div className={styles.item}>
+          <div className={styles['item-icon']}>
+            <Icon name='user-o' className={styles.img} />
+            <div className={styles.nickname}>{user?.nickname}</div>
+          </div>
+          <div className={styles['item-icon']}>
+            <IdIcon className={styles.img} />
+            <div className={styles.nickname}>{user?.phoneNum}</div>
+          </div>
+        </div>
       </div>
-      <div className={styles['item-icon']}>
-        <IdIcon/>
-        <div className={styles.nickname}>{user?.phoneNum}</div>
-      </div>
-    </div>
+    </Skeleton>
   )
 }

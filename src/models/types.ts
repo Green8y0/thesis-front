@@ -36,7 +36,9 @@ export interface IRoom {
   _id: string // rooms表_id
   name: string // 会议室名称
   creatorId: string // 会议室创建者userId
-  location: string
+  location: string // 会议室地址
+  capacity: number // 会议室容纳量
+  hasScreen: boolean // 是否有显示屏
 }
 
 export interface ISku {

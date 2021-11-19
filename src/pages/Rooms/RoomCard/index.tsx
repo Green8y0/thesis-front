@@ -3,7 +3,7 @@ import {
   List
 } from 'react-vant'
 
-import LocationIcon from '@/components/Icon/LocationIcon'
+// import LocationIcon from '@/components/Icon/LocationIcon'
 import { IRoom } from '@models/types'
 import styles from './style.module.less'
 
@@ -26,6 +26,28 @@ const CardHeader = ({ item }: {
   )
 }
 
+const CardContent = ({ item }: {
+  item: IRoom
+}) => {
+  return (
+    <>
+      <Cell
+        icon='location-o'
+        value={item.location}
+      >
+      </Cell>
+      <Cell
+        icon='friends-o'
+        value={item.capacity}
+      ></Cell>
+      <Cell
+        icon='tv-o'
+        value={item.hasScreen ? '有显示屏' : '无显示屏'}
+      ></Cell>
+    </>
+  )
+}
+
 export default function RoomCard({
   rooms,
   hasMore,
@@ -39,11 +61,7 @@ export default function RoomCard({
           className={styles.card}
         >
           <CardHeader item={item} />
-          <Cell
-            icon={<LocationIcon/>}
-            value={item.location}
-          >
-          </Cell>
+          <CardContent item={item} />
         </Cell.Group>
       ))}
     </List>

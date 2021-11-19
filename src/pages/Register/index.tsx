@@ -1,27 +1,28 @@
 import { useState } from 'react'
 import { useRequest } from 'ahooks'
 import { Link, useHistory } from 'react-router-dom'
-// import { UserAddOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
-import { Button, Toast } from 'react-vant'
+import {
+  Button,
+  Toast,
+  ConfigProvider,
+  Form,
+  Field
+} from 'react-vant'
 
-import styles from '../Login/style.module.less'
 import classNames from '@/libs/classNames'
+import RegisterIconFont from '@/components/Icon/RegisterIconFont'
 import { userService } from '@/services'
+import styles from '../Login/style.module.less'
+
+const themeVars = {
+  '--rv-cell-group-background-color': 'transparent'
+}
 
 export default function Register() {
   const history = useHistory()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [cfmPassword, setCfmPassword] = useState('')
-
-  // 判断是否已经登录
-  useRequest(userService.info, {
-    onSuccess: data => {
-      if (data.stat === 'OK') {
-        history.replace('/')
-      }
-    }
-  })
+  const [form] = Form.useForm()
+  const [phoneNum, setPhoneNum] = useState('')
+  const [nickName, setNickName] = useState('')
 
   const { run: register, loading } = useRequest(userService.register, {
     manual: true,
@@ -35,54 +36,67 @@ export default function Register() {
     }
   })
 
-  const disabled = () => {
-    if (!username || !password || !cfmPassword) return true
-    return loading
-  }
-
-  const submit = () => {
-    if (password.length < 6) {
-      return Toast('密码不能小于6位')
-    }
-    if (password !== cfmPassword) {
-      return Toast('两次密码不一致')
-    }
-    register(username, password)
-  }
-
   return (
-    <div className={classNames('page', styles.wrap)}>
-      <div className="header">
-        {/* <UserAddOutlined /> <span className="title">注册</span> */}
+    <div className={classNames(styles.wrap)}>
+      <div className={styles.header}>
+        <RegisterIconFont/>
       </div>
-      <div className={styles.form}>
-        {/* <InputItem
-          placeholder="请输入用户名"
-          value={username}
-          onChange={value => setUsername(value)}
-          icon={<UserOutlined />}
-        />
-        <InputItem
-          placeholder="请输入密码"
-          value={password}
-          type="password"
-          onChange={value => setPassword(value)}
-          icon={<KeyOutlined />}
-        />
-        <InputItem
-          placeholder="请确认密码"
-          value={cfmPassword}
-          type="password"
-          onChange={value => setCfmPassword(value)}
-          icon={<KeyOutlined />}
-        /> */}
-        <Button block size="large" disabled={disabled()} onClick={submit}>
-          注册
-        </Button>
+      <ConfigProvider themeVars={themeVars}>
+        <Form form={form}
+          className={styles.form}
+          onFinish={() => register(phoneNum, nickName)}
+          footer={
+            <Button block
+              round
+              color='#a0d911'
+              loading={loading}
+              size='large'
+              className={styles.btn}
+            >
+              注册
+            </Button>
+          }
+        >
+          <Form.Item name='phoneNum'
+            className={styles.input}
+            rules={[
+              {
+                validator: (_, value) => {
+                  if (/1\d{10}/.test(value)) {
+                    return Promise.resolve(true)
+                  }
+                  return Promise.reject(new Error('请输入正确的手机号码'))
+                }
+              }
+            ]}
+          >
+            <Field
+              value={phoneNum}
+              placeholder="请输入手机号"
+              type='tel'
+              clearable
+              onChange={val => setPhoneNum(val)}
+            />
+          </Form.Item>
+          <Form.Item name='code'
+            className={styles.input}
+          >
+            <Field
+              value={nickName}
+              center
+              clearable
+              placeholder="请输入昵称"
+              onChange={(val) => setNickName(val)}
+            />
+          </Form.Item>
+        </Form>
         <div className={styles.link}>
-          <Link to="/login">已有账号？前往登录</Link>
+          <Link to="/login">
+            <span>已有账号？前往</span>
+            <span style={{ color: '#40a9ff' }}>登录</span>
+          </Link>
         </div>
-      </div>
+      </ConfigProvider>
     </div>
   )
 }

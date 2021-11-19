@@ -27,40 +27,36 @@ export default function PackTabBar() {
   const onChange = (key: string) => {
     if (key === 'home') {
       setActiveKey('home')
-      history.push({
-        pathname: '/',
-        state: { site: 'wps' }
-      })
+      history.push('/')
     }
     if (key === 'me') {
       setActiveKey('me')
       history.push('/me')
     }
-    if (key === 'writing') {
-      setActiveKey('writing')
-      history.push({
-        pathname: '/writing',
-        state: { type: 'ask' }
-      })
+    if (key === 'new') {
+      setActiveKey('new')
+      history.push('/new')
     }
   }
 
   useEffect(() => {
     if (window.location.pathname.includes('me')) setActiveKey('me')
-    else if (window.location.pathname.includes('writing')) setActiveKey('writing')
+    else if (window.location.pathname.includes('new')) setActiveKey('new')
     else setActiveKey('home')
   }, [])
 
   return (
     <Tabbar
+      activeColor="#1890ff"
       value={activeKey}
-      onChange={() => onChange(activeKey)}
+      onChange={(v) => onChange(v as string)}
       className={styles.tabbar}
     >
       {tabs.map(item => (
         <Tabbar.Item
           key={item.key}
           icon={item.icon}
+          name={item.key}
         >{item.title}</Tabbar.Item>
       ))}
     </Tabbar>

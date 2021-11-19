@@ -4,7 +4,9 @@ import { Link, useHistory } from 'react-router-dom'
 import {
   Button,
   Toast,
-  Field
+  Field,
+  Form,
+  ConfigProvider
 } from 'react-vant'
 
 import classNames from '@/libs/classNames'
@@ -12,20 +14,15 @@ import LoginIconFont from '@/components/Icon/LoginIconFont'
 import { userService } from '@/services'
 import styles from './style.module.less'
 
+const themeVars = {
+  '--rv-cell-group-background-color': 'transparent'
+}
+
 export default function Login() {
   const history = useHistory()
+  const [form] = Form.useForm()
   const [phoneNum, setPhoneNum] = useState('')
   const [code, setCode] = useState(0)
-
-  // 判断是否已经登录
-  useRequest(userService.info, {
-    manual: true,
-    onSuccess: data => {
-      if (data.stat === 'OK') {
-        history.replace('/')
-      }
-    }
-  })
 
   const { run: login, loading } = useRequest(userService.login, {
     manual: true,
@@ -39,55 +36,76 @@ export default function Login() {
     }
   })
 
-  const disabled = () => {
-    if (!phoneNum || !code) return true
-    return loading
-  }
-
   return (
     <div className={classNames(styles.wrap)}>
       <div className={styles.header}>
-        {/* <UserOutlined /> <span className="title">登录</span> */}
         <LoginIconFont/>
       </div>
-      <div className={styles.form}>
-        <Field
-          placeholder='请输入手机号'
-          className={styles.input}
-          onChange={val => setPhoneNum(val)}
-          style={{
-            '--font-size': '1.5rem'
-          }}
-        />
-        <div>
-          <Field
-            placeholder='请输入验证码'
-            className={styles.input}
-            onChange={val => setCode(Number(val))}
-            style={{
-              '--font-size': '1.5rem'
-            }}
-          />
-          <Button
-            className={styles['btn-code']}
-          >
-            发送验证码
-          </Button>
-        </div>
-        <Button
-          block
-          size="large"
-          color='warning'
-          className={styles.btn}
-          disabled={disabled()}
-          onClick={() => login(phoneNum, code)}
+      <ConfigProvider themeVars={themeVars}>
+        <Form form={form}
+          className={styles.form}
+          onFinish={() => login(phoneNum, code)}
+          footer={
+            <Button block
+              round
+              color='#a0d911'
+              loading={loading}
+              size='large'
+              className={styles.btn}
+            >
+              登录
+            </Button>
+          }
         >
-          登录
-        </Button>
+          <Form.Item name='phoneNum'
+            className={styles.input}
+            rules={[
+              {
+                validator: (_, value) => {
+                  if (/1\d{10}/.test(value)) {
+                    return Promise.resolve(true)
+                  }
+                  return Promise.reject(new Error('请输入正确的手机号码'))
+                }
+              }
+            ]}
+          >
+            <Field
+              value={phoneNum}
+              placeholder="请输入手机号"
+              type='tel'
+              clearable
+              onChange={val => setPhoneNum(val)}
+            />
+          </Form.Item>
+          <Form.Item name='code'
+            className={styles.input}
+            rules={[{ pattern: /\d{6}/, message: '请输入6位数字' }]}
+          >
+            <Field
+              value={code ? code.toString() : ''}
+              center
+              clearable
+              placeholder="请输入短信验证码"
+              type='digit'
+              onChange={(val) => setCode(parseInt(val))}
+              button={
+                <Button size="small" color='#40a9ff'
+                  className={styles['btn-code']}
+                >
+                  发送
+                </Button>
+              }
+            />
+          </Form.Item>
+        </Form>
         <div className={styles.link}>
-          <Link to="/register">没有账号？前往注册</Link>
+          <Link to="/register">
+            <span>没有账号？前往</span>
+            <span style={{ color: '#40a9ff' }}>注册</span>
+          </Link>
         </div>
-      </div>
+      </ConfigProvider>
     </div>
   )
 }

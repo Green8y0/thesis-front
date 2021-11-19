@@ -1,8 +1,13 @@
 import { IconFont } from '../IconFont'
+import classNames from '@/libs/classNames'
 
-export default function customIcon () {
+interface Props {
+  className?: string
+}
+
+export default function customIcon ({ className }: Props) {
   return (
-    <div className="icons-list">
+    <div className={classNames('icons-list', className)}>
       <IconFont name="icon-zhanghaoquanxianguanli" />
     </div>
   )

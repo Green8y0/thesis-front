@@ -8,12 +8,14 @@ import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
+import FiltrateBar from './FiltrateBar'
 
 export default function Rooms() {
   const limit = useRef(10)
   const [hasMore, setHasMore] = useState(true)
   const [rooms, setRooms] = useState<IRoom[]>([])
   const [searchVal, setSearchVal] = useState('')
+  const [filterVal, setFilterVal] = useState<Record<string, string | number>>({})
 
   const { run: loadRooms } = useRequest(roomsService.list, {
     manual: true,
@@ -55,6 +57,10 @@ export default function Rooms() {
           value={searchVal}
           setValue={setValue}
           onClear={setValue}
+        />
+        <FiltrateBar
+          value={filterVal}
+          setValue={setFilterVal}
         />
       </Sticky>
       <PullToRefresh

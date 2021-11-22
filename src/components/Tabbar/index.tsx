@@ -14,7 +14,7 @@ export default function PackTabBar() {
       icon: 'wap-home-o'
     },
     {
-      key: 'new',
+      key: 'meetings',
       title: '会议',
       icon: 'todo-list-o'
     },
@@ -34,15 +34,15 @@ export default function PackTabBar() {
       setActiveKey('me')
       history.push('/me')
     }
-    if (key === 'new') {
-      setActiveKey('new')
-      history.push('/new')
+    if (key === 'meetings') {
+      setActiveKey('meetings')
+      history.push('/meetings')
     }
   }
 
   useEffect(() => {
     if (window.location.pathname.includes('me')) setActiveKey('me')
-    else if (window.location.pathname.includes('new')) setActiveKey('new')
+    else if (window.location.pathname.includes('meetings')) setActiveKey('meetings')
     else setActiveKey('home')
   }, [])
 

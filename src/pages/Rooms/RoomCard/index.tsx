@@ -1,3 +1,4 @@
+import { useHistory } from 'react-router-dom'
 import {
   Cell,
   List
@@ -13,14 +14,16 @@ interface Props {
   loadMore: () => Promise<void>
 }
 
-const CardHeader = ({ item }: {
+const CardHeader = ({ item, onClick }: {
   item: IRoom
+  onClick?: () => void
 }) => {
   return (
     <Cell
       icon='comment-o'
       value={item.name}
       isLink
+      onClick={() => onClick && onClick()}
     >
     </Cell>
   )
@@ -53,6 +56,7 @@ export default function RoomCard({
   hasMore,
   loadMore
 }: Props) {
+  const history = useHistory()
   return (
     <List finished={!hasMore} onLoad={loadMore}>
       {rooms?.map(item => (
@@ -60,7 +64,9 @@ export default function RoomCard({
           key={item._id}
           className={styles.card}
         >
-          <CardHeader item={item} />
+          <CardHeader item={item}
+            onClick={() => history.push(`/detail/${item._id}`)}
+          />
           <CardContent item={item} />
         </Cell.Group>
       ))}

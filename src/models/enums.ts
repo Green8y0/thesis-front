@@ -8,9 +8,9 @@ export enum RoleType {
   console = 'console'
 }
 export enum screenFilter {
-  unlimit = 0, // 不限
-  true = 1, // 有显示屏
-  false = 2 // 无显示屏
+  unlimit = 'undefined', // 不限
+  true = 'true', // 有显示屏
+  false = 'false' // 无显示屏
 }
 export enum memberFilter {
   unlimit = 0, // 不限

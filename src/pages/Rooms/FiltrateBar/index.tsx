@@ -1,9 +1,10 @@
+// 封装筛选工具栏
 import { DropdownMenu } from 'react-vant'
 import { screenFilter, memberFilter } from '@/models/enums'
 
 interface Props {
   value: Record<string, string | number>
-  setValue?: (v: Record<string, string | number>) => void
+  setValue: (v: Record<string, string | number>) => void
 }
 
 const screenOps = [
@@ -24,8 +25,16 @@ export default function FiltrateBar({
 }: Props) {
   return (
     <DropdownMenu value={value} onChange={setValue}>
-      <DropdownMenu.Item name='hasScreen' options={screenOps} />
-      <DropdownMenu.Item name='capacity' options={memberOps} />
+      <DropdownMenu.Item
+        name='hasScreen'
+        placeholder='显示屏'
+        options={screenOps}
+        />
+      <DropdownMenu.Item
+        name='capacity'
+        placeholder='人数'
+        options={memberOps}
+      />
     </DropdownMenu>
   )
 }

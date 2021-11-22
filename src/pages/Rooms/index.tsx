@@ -4,11 +4,19 @@ import { Sticky } from 'react-vant'
 
 import { roomsService } from '@/services'
 import { IRoom } from '@/models/types'
+import { screenFilter } from '@/models/enums'
 import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
 import FiltrateBar from './FiltrateBar'
+
+const getHasScreen = (val?: screenFilter) => {
+  // if (val === screenFilter.unlimit) return undefined
+  if (val === screenFilter.true) return true
+  if (val === screenFilter.false) return false
+  return undefined
+}
 
 export default function Rooms() {
   const limit = useRef(10)
@@ -30,8 +38,8 @@ export default function Rooms() {
   const loadMoreRooms = async () => {
     try {
       await loadRooms({
-        // eslint-disable-next-line no-unneeded-ternary
-        name: searchVal ? searchVal : undefined,
+        hasScreen: getHasScreen(filterVal.hasScreen as screenFilter),
+        name: searchVal || undefined,
         offset: rooms.length,
         limit: limit.current
       })
@@ -60,7 +68,11 @@ export default function Rooms() {
         />
         <FiltrateBar
           value={filterVal}
-          setValue={setFilterVal}
+          setValue={(v) => {
+            setHasMore(true)
+            setRooms([])
+            setFilterVal(v)
+          }}
         />
       </Sticky>
       <PullToRefresh

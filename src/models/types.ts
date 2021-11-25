@@ -9,9 +9,18 @@ export type PickSome<T, K extends keyof T> = {
  */
 export interface IUser {
   _id: string
+  /**
+   * 昵称
+   */
   nickname: string
+  /**
+   * 手机号
+   */
   phoneNum: string
-  role: RoleType
+  /**
+   * 角色权限
+   */
+  role: RoleType | RoleType[]
 }
 
 /**
@@ -32,13 +41,61 @@ export interface SearchType {
   order?: string[]
 }
 
+/**
+ * 会议室类型
+ */
 export interface IRoom {
-  _id: string // rooms表_id
-  name: string // 会议室名称
-  creatorId: string // 会议室创建者userId
-  location: string // 会议室地址
-  capacity: number // 会议室容纳量
-  hasScreen: boolean // 是否有显示屏
+  /**
+   * rooms表_id
+   */
+  _id: string
+  /**
+   * 会议室名称
+   */
+  name: string
+  /**
+   * 会议室地址
+   */
+  location: string
+  /**
+   * 会议室容纳量
+   */
+  capacity: number
+  /**
+   * 是否有显示屏
+   */
+  hasScreen: boolean
+  /**
+   * 会议室创建者
+   */
+  creator: Omit<IUser, 'phoneNum'>
+}
+
+/**
+ * 会议信息
+ */
+export interface IMeeting {
+  _id: string
+  /**
+   * 会议室_id
+   */
+  roomId: string
+  /**
+   * 会议主题
+   */
+  topic: string
+  /**
+   * 开始时间戳
+   */
+  startTime: number
+  /**
+   * 结束时间戳
+   */
+  endTime: number
+  /**
+   * 会议室创建者
+   */
+   creator: Omit<IUser, 'phoneNum'>
 }
 
 export interface ISku {

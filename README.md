@@ -1,6 +1,15 @@
-# React Todo
+# thesis-front
 
 该工程在 `create-react-app` 创建的工程的基础上做了一些修改
+
+## 开发流程
+
+```bash
+# 安装依赖
+yarn install
+# 启动项目
+yarn start
+```
 
 ## 代码规范
 
@@ -19,24 +28,10 @@
 
 ## 目录结构
 
-- assets：静态资源目录
-
-  - styles：全局样式
-
-- components：公共组件目录
-- libs：公共函数库目录
-- models：接口定义、枚举类型定义
-
-  - types.ts：interface 接口定义
-  - enums.ts：enum 枚举类型定义
-
-- pages：路由页面组件目录
-- services：服务模块目录，封装API请求等
-
 ## 前端路由设置
 
 - 首页：`/`
 - 登录：`/login`
 - 注册：`/register`
 - 个人中心：`/me`
-- 新增预订：`reserve`
+- 新增预订：`/reserve`

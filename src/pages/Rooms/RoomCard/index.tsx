@@ -4,7 +4,6 @@ import {
   List
 } from 'react-vant'
 
-// import LocationIcon from '@/components/Icon/LocationIcon'
 import { IRoom } from '@models/types'
 import styles from './style.module.less'
 
@@ -65,7 +64,7 @@ export default function RoomCard({
           className={styles.card}
         >
           <CardHeader item={item}
-            onClick={() => history.push(`/detail/${item._id}`)}
+            onClick={() => history.push(`/detail/${item._id}`, { room: item })}
           />
           <CardContent item={item} />
         </Cell.Group>

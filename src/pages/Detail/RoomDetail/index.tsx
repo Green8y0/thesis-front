@@ -7,7 +7,7 @@ interface Props {
 
 export default function RoomDetail({ room }: Props) {
   return (
-    <Cell.Group>
+    <Cell.Group style={{ marginBottom: '0.1rem' }}>
       <Cell
         icon='comment-o'
         title='会议室' value={room.name}

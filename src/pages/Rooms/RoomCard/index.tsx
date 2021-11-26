@@ -3,13 +3,15 @@ import {
   Cell,
   List
 } from 'react-vant'
+import { ListInstance } from 'react-vant/es/list'
 
 import { IRoom } from '@models/types'
 import styles from './style.module.less'
 
 interface Props {
   rooms: IRoom[]
-  hasMore: boolean
+  finished: boolean
+  listRef?: React.Ref<ListInstance>
   loadMore: () => Promise<void>
 }
 
@@ -51,13 +53,15 @@ const CardContent = ({ item }: {
 }
 
 export default function RoomCard({
-  rooms,
-  hasMore,
+  rooms, finished, listRef,
   loadMore
 }: Props) {
   const history = useHistory()
   return (
-    <List finished={!hasMore} onLoad={loadMore}>
+    <List finished={finished} onLoad={loadMore}
+      errorText='请求失败，点击重新加载'
+      ref={listRef}
+    >
       {rooms?.map(item => (
         <Cell.Group inset
           key={item._id}

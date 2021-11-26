@@ -6,6 +6,7 @@ const PREFIX = '/api/v1/meetings'
 
 interface ListData<T> {
   rows: T[]
+  total: number
 }
 
 interface ISearch extends SearchType {

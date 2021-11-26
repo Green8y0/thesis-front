@@ -1,4 +1,5 @@
-import { RoleType } from './enums'
+import { DropdownMenuItemOption } from 'react-vant/es/dropdown-menu/PropsType'
+import { MtimeOrder, RoleType } from './enums'
 
 export type PickSome<T, K extends keyof T> = {
   [P in keyof Pick<T, K>]?: T[P]
@@ -38,7 +39,7 @@ export interface ITodo {
 export interface SearchType {
   offset?: number
   limit?: number
-  order?: string[]
+  order?: MtimeOrder[]
 }
 
 /**
@@ -101,4 +102,10 @@ export interface IMeeting {
 export interface ISku {
   id: string
   title: string
+}
+
+export interface IMenu {
+  name: string
+  placeholder: string
+  options: DropdownMenuItemOption[]
 }

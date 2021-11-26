@@ -1,5 +1,5 @@
 import request, { BaseRes } from '../libs/request'
-import { memberFilter } from '@/models/enums'
+import { MemberFilter } from '@/models/enums'
 import { SearchType, IRoom } from '../models/types'
 
 // API路径前缀
@@ -14,7 +14,7 @@ interface ISearch extends SearchType {
   name?: string
   creatorIds?: string[]
   hasScreen?: boolean
-  capacity?: memberFilter
+  capacity?: MemberFilter
 }
 
 /**

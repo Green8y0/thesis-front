@@ -1,26 +1,50 @@
 import { useState, useRef } from 'react'
 import { useRequest } from 'ahooks'
 import { Sticky } from 'react-vant'
+import { ListInstance } from 'react-vant/es/list'
 
 import { roomsService } from '@/services'
-import { IRoom } from '@/models/types'
-import { screenFilter } from '@/models/enums'
+import { IMenu, IRoom } from '@/models/types'
+import { MemberFilter, ScreenFilter } from '@/models/enums'
 import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
-import FiltrateBar from './FiltrateBar'
+import FiltrateBar from '../../components/FiltrateBar'
 
-const getHasScreen = (val?: screenFilter) => {
-  // if (val === screenFilter.unlimit) return undefined
-  if (val === screenFilter.true) return true
-  if (val === screenFilter.false) return false
+const menus: IMenu[] = [
+  {
+    name: 'hasScreen',
+    placeholder: '显示屏',
+    options: [
+      { text: '不限', value: ScreenFilter.unlimit },
+      { text: '有显示屏', value: ScreenFilter.true },
+      { text: '无显示屏', value: ScreenFilter.false }
+    ]
+  },
+  {
+    name: 'capacity',
+    placeholder: '人数',
+    options: [
+      { text: '不限', value: MemberFilter.unlimit },
+      { text: '0-20人', value: MemberFilter.twenty },
+      { text: '21-99人', value: MemberFilter.ninetyNine },
+      { text: '100-499人', value: MemberFilter.max }
+    ]
+  }
+]
+
+const getHasScreen = (val?: ScreenFilter) => {
+  // if (val === ScreenFilter.unlimit) return undefined
+  if (val === ScreenFilter.true) return true
+  if (val === ScreenFilter.false) return false
   return undefined
 }
 
 export default function Rooms() {
   const limit = useRef(10)
-  const [hasMore, setHasMore] = useState(true)
+  const [finished, setFinished] = useState(false)
+  const listRef = useRef<ListInstance>(null)
   const [rooms, setRooms] = useState<IRoom[]>([])
   const [searchVal, setSearchVal] = useState('')
   const [filterVal, setFilterVal] = useState<Record<string, string | number>>({})
@@ -30,7 +54,7 @@ export default function Rooms() {
     onSuccess: data => {
       if (data.stat === 'OK') {
         setRooms(val => [...val, ...data.data.rows])
-        setHasMore(data.data.rows.length >= limit.current)
+        setFinished(data.data.rows.length < limit.current)
       }
     }
   })
@@ -38,7 +62,7 @@ export default function Rooms() {
   const loadMoreRooms = async () => {
     try {
       await loadRooms({
-        hasScreen: getHasScreen(filterVal.hasScreen as screenFilter),
+        hasScreen: getHasScreen(filterVal.hasScreen as ScreenFilter),
         name: searchVal || undefined,
         offset: rooms.length,
         limit: limit.current
@@ -49,7 +73,7 @@ export default function Rooms() {
   }
 
   const setValue = (val: string) => {
-    setHasMore(true)
+    setFinished(false)
     setRooms([])
     setSearchVal(val)
   }
@@ -67,9 +91,10 @@ export default function Rooms() {
           onClear={setValue}
         />
         <FiltrateBar
+          menus={menus}
           value={filterVal}
-          setValue={(v) => {
-            setHasMore(true)
+          onChange={(v) => {
+            setFinished(false)
             setRooms([])
             setFilterVal(v)
           }}
@@ -77,13 +102,16 @@ export default function Rooms() {
       </Sticky>
       <PullToRefresh
         onRefresh={async () => {
+          setFinished(false)
           setRooms([])
-          setHasMore(true)
+          listRef.current?.check()
         }}
       >
-        <RoomCard rooms={rooms}
+        <RoomCard
+          listRef={listRef}
+          rooms={rooms}
           loadMore={loadMoreRooms}
-          hasMore={hasMore}
+          finished={finished}
         />
       </PullToRefresh>
     </Layout>

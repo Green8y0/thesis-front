@@ -98,8 +98,12 @@ export default function Rooms() {
         <SearchBar
           placeholder='请输入内容'
           value={searchVal}
-          setValue={setValue}
-          onClear={setValue}
+          setValue={val => {
+            refresh(() => setSearchVal(val))
+          }}
+          onClear={val => {
+            refresh(() => setSearchVal(val))
+          }}
         />
         <FiltrateBar
           menus={menus}

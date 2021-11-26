@@ -78,6 +78,17 @@ export default function Rooms() {
     setSearchVal(val)
   }
 
+  const refresh = async (fn?: () => void) => {
+    return new Promise(resolve => {
+      setFinished(false)
+      setRooms([])
+      fn && fn()
+      resolve('')
+    }).then(() => {
+      listRef.current?.check()
+    })
+  }
+
   return (
     <Layout
       showNav={false}
@@ -94,17 +105,15 @@ export default function Rooms() {
           menus={menus}
           value={filterVal}
           onChange={(v) => {
-            setFinished(false)
-            setRooms([])
-            setFilterVal(v)
+            refresh(() => {
+              setFilterVal(v)
+            })
           }}
         />
       </Sticky>
       <PullToRefresh
         onRefresh={async () => {
-          setFinished(false)
-          setRooms([])
-          listRef.current?.check()
+          refresh()
         }}
       >
         <RoomCard

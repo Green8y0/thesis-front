@@ -72,12 +72,6 @@ export default function Rooms() {
     }
   }
 
-  const setValue = (val: string) => {
-    setFinished(false)
-    setRooms([])
-    setSearchVal(val)
-  }
-
   const refresh = async (fn?: () => void) => {
     return new Promise(resolve => {
       setFinished(false)

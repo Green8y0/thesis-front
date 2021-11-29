@@ -8,9 +8,12 @@ import {
   Icon,
   ActionSheet
 } from 'react-vant'
+import { ActionSheetAction } from 'react-vant/es/action-sheet/PropsType'
+import { ActionSheetProps } from 'react-vant/es/action-sheet'
+
 import { IMeeting } from '@/models/types'
+import { MtimeOrder, MeetingFilter } from '@/models/enums'
 import styles from './style.module.less'
-import { MtimeOrder } from '@/models/enums'
 
 interface Props {
   total: number
@@ -21,37 +24,30 @@ interface Props {
   setSort: (order: MtimeOrder) => void
 }
 
-const actions = [
-  { name: '最新' },
-  { name: '最旧' }
+const actions: ActionSheetAction[] = [
+  { name: MeetingFilter.latest },
+  { name: MeetingFilter.oldest }
 ]
 
 /**
  * 排序菜单
  * @param visible 菜单的显示
- * @param setVisible 修改菜单的显示
+ * @param onCancel 取消事件
  * @param onSelect 点击选项的触发事件
  * @returns 排序方式的菜单
  */
 const SortMenu = ({
-  visible, setVisible, onSelect
-}: {
-  visible: boolean
-  setVisible: (val: boolean) => void
-  onSelect: (order: MtimeOrder) => void
-}) => {
+  visible, onCancel, onSelect
+}: ActionSheetProps) => {
   return (
     <ActionSheet
       visible={visible}
-      onCancel={() => setVisible(false)}
+      onCancel={onCancel}
       actions={actions}
       description={<span className={styles.desc}>排序方式</span>}
       cancelText='取消'
       closeOnClickAction
-      onSelect={(actions) => {
-        if (actions.name === '最新') onSelect(MtimeOrder.desc)
-        if (actions.name === '最旧') onSelect(MtimeOrder.asc)
-      }}
+      onSelect={onSelect}
     />
   )
 }
@@ -75,7 +71,7 @@ const FilterBar = ({
       <Cell
         title={`共${total}场会议`}
         titleClass={styles.filter}
-        value={sort === MtimeOrder.desc ? '最新' : '最旧'}
+        value={sort === MtimeOrder.desc ? '最新' : '最早'}
         isLink
         center
         rightIcon={
@@ -87,6 +83,46 @@ const FilterBar = ({
         }
       />
     </Cell.Group>
+  )
+}
+
+/**
+ * 渲染会议信息
+ * @param hasMore 控制触底是否加载
+ * @param meetings 会议信息数组
+ * @param loadMore 加载函数
+ * @returns 渲染会议信息
+ */
+const MeetingList = ({
+  hasMore, meetings, loadMore
+}: {
+  meetings: IMeeting[]
+  hasMore: boolean
+  loadMore: () => Promise<void>
+}) => {
+  return (
+    <List finished={!hasMore} onLoad={loadMore}>
+      {meetings.map(item => (
+        <Cell.Group key={item._id} className={styles.cell}>
+          <Cell
+            icon='label-o'
+            title={item.topic}
+            rightIcon={<Icon name='ellipsis' />}
+            isLink
+            center
+          />
+          <Cell
+            title={item.creator.nickname}
+            icon='manager-o'
+          />
+          <Cell
+            icon='clock-o'
+            title={dayjs(item.startTime).format('YYYY-MM-DD')}
+            label={`${dayjs(item.startTime).format('HH:mm')}~${dayjs(item.endTime).format('HH:mm')}`}
+          />
+        </Cell.Group>
+      ))}
+    </List>
   )
 }
 
@@ -104,32 +140,18 @@ export default function MeetingRecord({
           rightIconOnClick={val => setVisible(val)}
         />
       </Sticky>
-      <List finished={!hasMore} onLoad={loadMore}>
-        {meetings.map(item => (
-          <Cell.Group key={item._id} className={styles.cell}>
-            <Cell
-              icon='label-o'
-              title={item.topic}
-              rightIcon={<Icon name='ellipsis' />}
-              isLink
-              center
-            />
-            <Cell
-              title={item.creator.nickname}
-              icon='manager-o'
-            />
-            <Cell
-              icon='clock-o'
-              title={dayjs(item.startTime).format('YYYY-MM-DD')}
-              label={`${dayjs(item.startTime).format('HH:mm')}~${dayjs(item.endTime).format('HH:mm')}`}
-            />
-          </Cell.Group>
-        ))}
-      </List>
+      <MeetingList
+        hasMore={hasMore}
+        loadMore={loadMore}
+        meetings={meetings}
+      />
       <SortMenu
         visible={visible}
-        setVisible={val => setVisible(val)}
-        onSelect={setSort}
+        onCancel={() => setVisible(false)}
+        onSelect={(actions) => {
+          if (actions.name === MeetingFilter.latest) setSort(MtimeOrder.desc)
+          if (actions.name === MeetingFilter.oldest) setSort(MtimeOrder.asc)
+        }}
       />
     </Flex>
   )

@@ -4,6 +4,7 @@ import Rooms from '../Rooms'
 import Me from '../Me'
 import Meetings from '../Meetings'
 import Detail from '../Detail'
+import Update from '../Update'
 import styles from './style.module.less'
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
           <Route path='/me' exact component={Me} />
           <Route path='/meetings' exact component={Meetings} />
           <Route path='/detail/:id' component={Detail} />
+          <Route path='/update/:id' component={Update} />
           <Route path='/' exact component={Rooms} />
         </Switch>
       </main>

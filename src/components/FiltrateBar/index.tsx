@@ -1,11 +1,11 @@
 // 封装筛选工具栏
 import { DropdownMenu } from 'react-vant'
-import { IMenu } from '@/models/types'
+import { DropdownMenuItemProps } from 'react-vant/es/dropdown-menu/PropsType'
 
 interface Props {
   value: Record<string, string | number>
   onChange: (v: Record<string, string | number>) => void
-  menus: IMenu[]
+  menus: DropdownMenuItemProps[]
 }
 
 export default function FiltrateBar({

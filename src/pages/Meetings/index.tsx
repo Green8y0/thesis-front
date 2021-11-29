@@ -22,11 +22,6 @@ const extraTabs: ITab[] = [
     key: 'addRoom',
     value: '新增会议室',
     icon: <Icon name='cluster-o' size='0.5rem' />
-  },
-  {
-    key: 'editRoom',
-    value: '编辑会议室',
-    icon: <Icon name="records" size='0.5rem' />
   }
 ]
 

@@ -2,6 +2,7 @@ export enum UserStatus {
   Normal = 1,
   Disabled = 2
 }
+
 /**
  * 角色类型
  */
@@ -19,6 +20,7 @@ export enum RoleType {
    */
   console = 'console'
 }
+
 /**
  * 显示屏筛选
  */
@@ -36,6 +38,7 @@ export enum ScreenFilter {
    */
   false = 'false'
 }
+
 /**
  * 人数筛选
  */
@@ -57,6 +60,21 @@ export enum MemberFilter {
    */
   max = 3
 }
+
+/**
+ * 会议筛选
+ */
+export enum MeetingFilter {
+  /**
+   * 按最新排序
+   */
+  latest = '最新',
+  /**
+   * 按最早排序
+   */
+  oldest = '最早'
+}
+
 /**
  * 修改时间排序类型
  */
@@ -69,4 +87,18 @@ export enum MtimeOrder {
    * 按修改时间(mtime)升序
    */
   asc = '+mtime'
+}
+
+/**
+ * 记录状态
+ */
+export enum DataStatus {
+  /**
+   * 正常
+   */
+  normal = 0,
+  /**
+   * 已删除
+   */
+  deleted = 1
 }

@@ -17,17 +17,6 @@ export default function PackNavBar({
   const history = useHistory()
 
   const onBack = () => {
-    // const query = new URLSearchParams(window.location.search)
-    // const code = query.get('code')
-    // if (code) {
-    //   // 从首页进详情页，登录返回详情，导航栏goBack
-    //   history.replace({
-    //     pathname: '/',
-    //     state: { site: 'wps' }
-    //   })
-    // } else {
-    //   history.goBack()
-    // }
     history.goBack()
   }
 

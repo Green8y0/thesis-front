@@ -1,4 +1,3 @@
-import { DropdownMenuItemOption } from 'react-vant/es/dropdown-menu/PropsType'
 import { MtimeOrder, RoleType } from './enums'
 
 export type PickSome<T, K extends keyof T> = {
@@ -102,10 +101,4 @@ export interface IMeeting {
 export interface ISku {
   id: string
   title: string
-}
-
-export interface IMenu {
-  name: string
-  placeholder: string
-  options: DropdownMenuItemOption[]
 }

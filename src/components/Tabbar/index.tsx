@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { Tabbar } from 'react-vant'
-// import { WritingType } from '@/models/enums'
 import styles from './style.module.less'
 
 export default function PackTabBar() {
   const history = useHistory()
+  const location = useLocation()
   const [activeKey, setActiveKey] = useState('home')
   const tabs = [
     {
@@ -26,25 +26,23 @@ export default function PackTabBar() {
   ]
 
   const onChange = (key: string) => {
+    setActiveKey(key)
     if (key === 'home') {
-      setActiveKey('home')
       history.push('/')
     }
     if (key === 'me') {
-      setActiveKey('me')
       history.push('/me')
     }
     if (key === 'meetings') {
-      setActiveKey('meetings')
       history.push('/meetings')
     }
   }
 
   useEffect(() => {
-    if (window.location.pathname.includes('me')) setActiveKey('me')
-    else if (window.location.pathname.includes('meetings')) setActiveKey('meetings')
+    if (location.pathname === '/me') setActiveKey('me')
+    else if (location.pathname === '/meetings') setActiveKey('meetings')
     else setActiveKey('home')
-  }, [])
+  }, [location.pathname])
 
   return (
     <Tabbar

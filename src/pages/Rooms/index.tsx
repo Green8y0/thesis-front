@@ -2,9 +2,10 @@ import { useState, useRef } from 'react'
 import { useRequest } from 'ahooks'
 import { Sticky } from 'react-vant'
 import { ListInstance } from 'react-vant/es/list'
+import { DropdownMenuItemProps } from 'react-vant/es/dropdown-menu/PropsType'
 
 import { roomsService } from '@/services'
-import { IMenu, IRoom } from '@/models/types'
+import { IRoom } from '@/models/types'
 import { MemberFilter, ScreenFilter } from '@/models/enums'
 import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
@@ -12,7 +13,7 @@ import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
 import FiltrateBar from '../../components/FiltrateBar'
 
-const menus: IMenu[] = [
+const menus: DropdownMenuItemProps[] = [
   {
     name: 'hasScreen',
     placeholder: '显示屏',

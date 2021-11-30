@@ -65,6 +65,7 @@ export default function Rooms() {
       await loadRooms({
         hasScreen: getHasScreen(filterVal.hasScreen as ScreenFilter),
         name: searchVal || undefined,
+        capacity: filterVal.capacity as MemberFilter,
         offset: rooms.length,
         limit: limit.current
       })

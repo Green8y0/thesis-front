@@ -19,7 +19,7 @@ interface ISearch extends SearchType {
 interface IUpdate {
   roomId: string
   name?: string
-  hasScreen?: string
+  hasScreen?: boolean
   capacity?: number
   location?: string
 }

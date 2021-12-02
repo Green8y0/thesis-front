@@ -1,18 +1,23 @@
 import { useState } from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useHistory, useParams } from 'react-router-dom'
 import { useRequest } from 'ahooks'
-import { Button, Field, Form, Radio, Toast } from 'react-vant'
+import { Field, Form, Radio, Toast } from 'react-vant'
 import { FormItemProps } from 'react-vant/es/form'
 
 import Layout from '@/components/Layout'
+import RoomEditForm from '@/components/RoomEditForm'
 import { IRoom } from '@/models/types'
 import { roomsService } from '@/services'
-import styles from './style.module.less'
+
+interface Params {
+  id: string
+}
 
 export default function Update() {
   const [form] = Form.useForm()
   const history = useHistory()
   const location = useLocation<IRoom>()
+  const { id } = useParams<Params>()
   const [room, setRoom] = useState<IRoom>(location.state)
   const formList: FormItemProps[] = [
     {
@@ -21,7 +26,7 @@ export default function Update() {
       rules: [
         { min: 2 }
       ],
-      children: <Field placeholder={room.name} />
+      children: <Field placeholder={room?.name} />
     },
     {
       name: 'capacity',
@@ -31,7 +36,7 @@ export default function Update() {
       ],
       children: (
         <Field
-          placeholder={room.capacity.toString()}
+          placeholder={room?.capacity.toString()}
           type='number'
         />
       )
@@ -42,7 +47,7 @@ export default function Update() {
       children: (
         <Radio.Group
           direction='horizontal'
-          defaultValue={Number(room.hasScreen)}
+          defaultValue={Number(room?.hasScreen)}
           checkedColor='#ee0a24'
         >
           <Radio name={1}>有</Radio>
@@ -55,7 +60,7 @@ export default function Update() {
       label: '地址',
       children: (
         <Field
-          placeholder={room.location}
+          placeholder={room?.location}
           type='textarea'
           maxlength={15}
           showWordLimit
@@ -64,7 +69,8 @@ export default function Update() {
     }
   ]
 
-  useRequest(() => roomsService.list({ roomsIds: [room._id] }), {
+  // url直接跳转到修改页，即location.state = undefined
+  useRequest(() => roomsService.list({ roomsIds: [id] }), {
     ready: !location.state,
     onSuccess: data => {
       if (data.stat === 'OK' && data.data.rows.length > 0) {
@@ -78,6 +84,9 @@ export default function Update() {
       if (data.stat === 'OK') {
         Toast.success('修改成功')
         history.push('/')
+      } else {
+        Toast.fail(data.msg)
+        history.push(`/detail/${id}`)
       }
     }
   })
@@ -97,28 +106,10 @@ export default function Update() {
       showTab={false}
       navText='编辑会议室'
     >
-      <Form
-        form={form}
-        onFinish={onFinish}
-        footer={
-          <div className={styles.submit}>
-            <Button
-              type='warning'
-              nativeType='submit'
-              block
-              round
-            >提交</Button>
-          </div>
-        }
-      >
-        {formList.map(item => (
-          <Form.Item
-            key={item.name as string}
-            name={item.name}
-            label={item.label}
-          >{item.children}</Form.Item>
-        ))}
-      </Form>
+      {formList && <RoomEditForm
+        formProps={{ form, onFinish }}
+        formList={formList}
+      />}
     </Layout>
   )
 }

@@ -16,11 +16,29 @@ interface ISearch extends SearchType {
   hasScreen?: boolean
   capacity?: MemberFilter
 }
+/**
+ * 会议室可删除信息
+ */
 interface IUpdate {
+  /**
+   * 修改的会议室_id
+   */
   roomId: string
+  /**
+   * 名称
+   */
   name?: string
+  /**
+   * 是否有显示屏
+   */
   hasScreen?: boolean
+  /**
+   * 人员容纳量
+   */
   capacity?: number
+  /**
+   * 会议室地址
+   */
   location?: string
 }
 
@@ -40,16 +58,39 @@ export async function list(record: ISearch) {
   return data
 }
 
-export async function deleteRoom(roomId: string, status: DataStatus) {
+/**
+ * 删除会议室记录
+ * @param roomId 会议室id
+ * @param status 会议室状态，默认传递已删除
+ * @returns modifiedId
+ */
+export async function deleteRoom(roomId: string, status: DataStatus = DataStatus.deleted) {
   const { data } = await request.post<BaseRes>(
     `${PREFIX}/update`, { roomId, status }
   )
   return data
 }
 
+/**
+ * 修改会议室记录
+ * @param record 修改的信息
+ * @returns modifiedId
+ */
 export async function update(record: IUpdate) {
   const { data } = await request.post<BaseRes>(
     `${PREFIX}/update`, record
+  )
+  return data
+}
+
+/**
+ * 新增会议室记录
+ * @param record 新增会议室信息
+ * @returns 见接口文档
+ */
+export async function add(record: Omit<IRoom, '_id' | 'creator'>) {
+  const { data } = await request.post<BaseRes>(
+    `${PREFIX}/add`, { ...record, hasScreen: Boolean(record.hasScreen) }
   )
   return data
 }

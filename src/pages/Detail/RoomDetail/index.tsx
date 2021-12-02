@@ -110,7 +110,7 @@ export default function RoomDetail({ room }: Props) {
           if (actions.name === MenuName.delete) {
             onDelete(room._id, DataStatus.deleted)
           } else if (actions.name === MenuName.edit) {
-            history.push(`/update/${room._id}`, room)
+            history.push(`/room/update/${room._id}`, room)
           }
         }}
       />

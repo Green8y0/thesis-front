@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useRequest } from 'ahooks'
 
 import RoomDetail from './RoomDetail'
@@ -8,17 +8,21 @@ import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import { IMeeting, IRoom } from '@/models/types'
 import { MtimeOrder } from '@/models/enums'
-import { meetingsService } from '@/services'
+import { meetingsService, roomsService } from '@/services'
 import { filterSameKey } from '@/libs/utils'
 
 interface ILocationState {
   room: IRoom
 }
+interface Params {
+  id: string
+}
 
 export default function Detail() {
   const location = useLocation<ILocationState>()
+  const { id } = useParams<Params>()
   const limit = useRef(10)
-  const room = useRef(location.state.room)
+  const [room, setRoom] = useState(location.state?.room)
   const [hasMore, setHasMore] = useState(true)
   // 会议信息
   const [meetings, setMeetings] = useState<IMeeting[]>([])
@@ -35,11 +39,19 @@ export default function Detail() {
       }
     }
   })
+  useRequest(roomsService.list, {
+    ready: !!id,
+    onSuccess: data => {
+      if (data.stat === 'OK' && data.data.rows.length > 0) {
+        setRoom(data.data.rows[0])
+      }
+    }
+  })
 
-  const loadMoreRooms = async () => {
+  const loadMoreMeetings = async () => {
     try {
       await loadM({
-        roomsIds: [room.current._id],
+        roomsIds: [id],
         offset: meetings.length,
         limit: limit.current,
         order: [sort]
@@ -54,9 +66,11 @@ export default function Detail() {
       showTab={false}
       navText='会议室'
     >
-      <RoomDetail
-        room={room.current}
-      />
+      {room &&
+        <RoomDetail
+          room={room}
+        />
+      }
       <PullToRefresh
         onRefresh={async () => {
           setMeetings([])
@@ -65,7 +79,7 @@ export default function Detail() {
       >
         <MeetingRecord
           hasMore={hasMore}
-          loadMore={loadMoreRooms}
+          loadMore={loadMoreMeetings}
           meetings={meetings}
           total={total}
           sort={sort}

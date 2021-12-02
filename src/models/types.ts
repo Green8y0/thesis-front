@@ -23,18 +23,6 @@ export interface IUser {
   role: RoleType | RoleType[]
 }
 
-/**
- * TODO
- */
-export interface ITodo {
-  _id: string
-  content: string
-  userId: string
-  finished: boolean
-  marked: boolean
-  createdAt: number
-}
-
 export interface SearchType {
   offset?: number
   limit?: number
@@ -96,9 +84,4 @@ export interface IMeeting {
    * 会议室创建者
    */
    creator: Omit<IUser, 'phoneNum'>
-}
-
-export interface ISku {
-  id: string
-  title: string
 }

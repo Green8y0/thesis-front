@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useRequest } from 'ahooks'
+import dayjs from 'dayjs'
 import {
   Cell,
-  Icon
+  Icon,
+  Calendar
 } from 'react-vant'
-
 import { CellProps } from 'react-vant/es/cell'
+import { CalendarValue } from 'react-vant/es/calendar/PropsType'
 
 import Layout from '@/components/Layout'
+import ReserveSearch from './ReserveSearch'
 import { userService } from '@/services'
 import { filterSameKey } from '@/libs/utils'
 import { RoleType } from '@/models/enums'
@@ -20,6 +23,14 @@ interface ITab extends CellProps {
 
 export default function Meetings() {
   const history = useHistory()
+  const [visible, setVisible] = useState(false)
+  const [text, setText] = useState('')
+
+  const onConfirm = (date: CalendarValue) => {
+    const dateStr = dayjs(date as Date).format('YYYY-MM-DD')
+    setText(dateStr)
+    setVisible(false)
+  }
 
   const extraTabs: ITab[] = [{
     key: 'addRoom',
@@ -31,7 +42,8 @@ export default function Meetings() {
   const [tabs, setTabs] = useState<ITab[]>([{
     key: 'reserveRoom',
     value: '预定会议室',
-    icon: <Icon name='calendar-o' size='0.5rem' />
+    icon: <Icon name='calendar-o' size='0.5rem' />,
+    onClick: () => setVisible(true)
   }])
 
   // 根据用户权限设置是否可新增会议室
@@ -68,6 +80,8 @@ export default function Meetings() {
           ))
         }
       </div>
+      <Calendar visible={visible} onConfirm={onConfirm} />
+      <ReserveSearch/>
     </Layout>
   )
 }

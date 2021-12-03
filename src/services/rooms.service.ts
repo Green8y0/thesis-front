@@ -1,13 +1,9 @@
 import request, { BaseRes } from '../libs/request'
 import { MemberFilter, DataStatus } from '@/models/enums'
-import { SearchType, IRoom } from '../models/types'
+import { SearchType, IRoom, ListData } from '../models/types'
 
 // API路径前缀
 const PREFIX = '/api/v1/rooms'
-
-interface ListData<T> {
-  rows: T[]
-}
 
 interface ISearch extends SearchType {
   roomsIds?: string[]

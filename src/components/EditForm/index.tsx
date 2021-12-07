@@ -11,7 +11,7 @@ interface IFormProps {
   formList: FormItemProps[]
 }
 
-export default function RoomEditForm({ formProps, formList }: IFormProps) {
+export default function EditForm({ formProps, formList }: IFormProps) {
   return (
     <Form
       {...formProps}

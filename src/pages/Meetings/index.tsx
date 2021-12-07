@@ -11,7 +11,6 @@ import { CellProps } from 'react-vant/es/cell'
 import { CalendarValue } from 'react-vant/es/calendar/PropsType'
 
 import Layout from '@/components/Layout'
-import ReserveSearch from './ReserveSearch'
 import { userService } from '@/services'
 import { filterSameKey } from '@/libs/utils'
 import { RoleType } from '@/models/enums'
@@ -23,13 +22,13 @@ interface ITab extends CellProps {
 
 export default function Meetings() {
   const history = useHistory()
+  // 日历组件的显隐
   const [visible, setVisible] = useState(false)
-  const [text, setText] = useState('')
 
   const onConfirm = (date: CalendarValue) => {
     const dateStr = dayjs(date as Date).format('YYYY-MM-DD')
-    setText(dateStr)
     setVisible(false)
+    history.push('/reserve', { dateText: dateStr })
   }
 
   const extraTabs: ITab[] = [{
@@ -81,7 +80,6 @@ export default function Meetings() {
         }
       </div>
       <Calendar visible={visible} onConfirm={onConfirm} />
-      <ReserveSearch/>
     </Layout>
   )
 }

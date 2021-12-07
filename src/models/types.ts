@@ -87,5 +87,5 @@ export interface IMeeting {
   /**
    * 会议室创建者
    */
-   creator: Omit<IUser, 'phoneNum'>
+  creator: Omit<IUser, 'phoneNum'>
 }

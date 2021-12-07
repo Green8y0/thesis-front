@@ -5,7 +5,7 @@ import { Field, Form, Radio, Toast } from 'react-vant'
 import { FormItemProps } from 'react-vant/es/form'
 
 import Layout from '@/components/Layout'
-import RoomEditForm from '@/components/RoomEditForm'
+import RoomEditForm from '@/components/EditForm'
 import { IRoom } from '@/models/types'
 import { roomsService } from '@/services'
 

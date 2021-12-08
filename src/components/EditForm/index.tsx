@@ -29,9 +29,8 @@ export default function EditForm({ formProps, formList }: IFormProps) {
       {formList.map(item => (
         <Form.Item
           key={item.name as string}
-          name={item.name}
-          label={item.label}
-        >{item.children}</Form.Item>
+          {...item}
+        />
       ))}
     </Form>
   )

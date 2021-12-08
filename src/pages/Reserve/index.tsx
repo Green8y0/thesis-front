@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Field, Form, Popup, Radio } from 'react-vant'
+import { DatetimePicker, Form, Popup } from 'react-vant'
 import { FormItemProps } from 'react-vant/es/form'
 
 import Layout from '@/components/Layout'
 import EditForm from '@/components/EditForm'
 import { IRoom, IMeeting } from '@/models/types'
+import { useFormList } from './hooks/useFormList'
 
 interface IAddMeeting extends
 Pick<IRoom, 'hasScreen' | 'capacity'>,
@@ -18,70 +19,35 @@ interface ILocation {
 export default function Reserve() {
   const location = useLocation<ILocation>()
   const [form] = Form.useForm()
-  const [dateText, setDateText] = useState(location.state?.dateText)
-  const [startVisible, setStartVisible] = useState(false)
-  const formList: FormItemProps[] = [
-    {
-      name: 'topic',
-      label: '会议主题',
-      rules: [
-        { required: true }
-      ],
-      children: <Field placeholder='请输入会议主题'/>
+  const [dateText] = useState(location.state?.dateText)
+  const [popupVisible, setPopupVisible] = useState(false)
+  const [changeFeild, setChangeFeild] = useState('')
+  const formList: FormItemProps[] = useFormList({
+    startTimeFieldProps: {
+      onClick: () => {
+        setPopupVisible(true)
+        setChangeFeild('startTime')
+      }
     },
-    {
-      name: 'capacity',
-      label: '与会人数',
-      rules: [
-        { type: 'number' }
-      ],
-      children: (
-        <Field
-          placeholder='请输入与会人数'
-          type='number'
-        />
-      )
-    },
-    {
-      name: 'dateText',
-      label: '会议日期',
-      children: <Field readonly placeholder={dateText} />
-    },
-    {
-      name: 'startTime',
-      label: '开始时间',
-      children: (
-        <Field
-          placeholder='请选择会议开始时间'
-          children={
-            <Popup
-              visible={startVisible}
-              round
-              position='bottom'
-            >
-
-            </Popup>
-          }
-        />
-      )
-    },
-    {
-      name: 'hasScreen',
-      label: '是否有显示屏',
-      children: (
-        <Radio.Group
-          direction='horizontal'
-          checkedColor='#ee0a24'
-        >
-          <Radio name={1}>有</Radio>
-          <Radio name={0}>无</Radio>
-        </Radio.Group>
-      )
+    endTimeFieldProps: {
+      onClick: () => {
+        setPopupVisible(true)
+        setChangeFeild('endTime')
+      }
     }
-  ]
+  })
 
   const onFinish = async (val: IAddMeeting) => {
     console.log(val)
+  }
+  const changeStartTime = (value: string) => {
+    console.log(value)
+    if (changeFeild) {
+      form.setFields([{
+        name: changeFeild,
+        value: value
+      }])
+    }
   }
   return (
     <Layout
@@ -90,9 +56,38 @@ export default function Reserve() {
       navText='预订会议室'
     >
       <EditForm
-        formProps={{ form, onFinish }}
+        formProps={{
+          form,
+          initialValues: { dateText },
+          onFinish
+        }}
         formList={formList}
       />
+      <Popup
+        visible={popupVisible}
+        round
+        position='bottom'
+        onClose={() => setPopupVisible(false)}
+      >
+        <DatetimePicker
+          title='请选择开始时间'
+          type='time'
+          minHour={10}
+          maxHour={21}
+          filter={(type, options) => {
+            if (type === 'minute') {
+              return options.filter((option) => Number(option) % 5 === 0)
+            }
+            return options
+          }}
+          // value={startTime}
+          onCancel={() => setPopupVisible(false)}
+          onConfirm={(value: string) => {
+            setPopupVisible(false)
+            changeStartTime(value)
+          }}
+        />
+      </Popup>
     </Layout>
   )
 }

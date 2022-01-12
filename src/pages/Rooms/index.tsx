@@ -6,7 +6,7 @@ import { DropdownMenuItemProps } from 'react-vant/es/dropdown-menu/PropsType'
 
 import { roomsService } from '@/services'
 import { IRoom } from '@/models/types'
-import { MemberFilter, ScreenFilter } from '@/models/enums'
+import { CapacityOrder, MemberFilter, MtimeOrder, ScreenFilter } from '@/models/enums'
 import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import SearchBar from '@/components/SearchBar'
@@ -47,6 +47,7 @@ export default function Rooms() {
   const [finished, setFinished] = useState(false)
   const listRef = useRef<ListInstance>(null)
   const [rooms, setRooms] = useState<IRoom[]>([])
+  const [order, setOrder] = useState<MtimeOrder | CapacityOrder>(MtimeOrder.desc)
   const [searchVal, setSearchVal] = useState('')
   const [filterVal, setFilterVal] = useState<Record<string, string | number>>({})
 
@@ -67,7 +68,8 @@ export default function Rooms() {
         name: searchVal || undefined,
         capacity: filterVal.capacity as MemberFilter,
         offset: rooms.length,
-        limit: limit.current
+        limit: limit.current,
+        order: [order] as MtimeOrder[] | CapacityOrder[]
       })
     } catch (error) {
       console.trace(error)
@@ -106,6 +108,7 @@ export default function Rooms() {
           value={filterVal}
           onChange={(v) => {
             refresh(() => {
+              if (v && v.capacity) setOrder(CapacityOrder.desc)
               setFilterVal(v)
             })
           }}

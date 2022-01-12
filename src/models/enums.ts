@@ -90,6 +90,20 @@ export enum MtimeOrder {
 }
 
 /**
+ * 人数容纳量排序类型
+ */
+export enum CapacityOrder {
+  /**
+   * 按人数容纳量(capacity)降序
+   */
+  desc = '-capacity',
+  /**
+   * 按人数容纳量(capacity)升序
+   */
+  asc = '+capacity'
+}
+
+/**
  * 记录状态
  */
 export enum DataStatus {

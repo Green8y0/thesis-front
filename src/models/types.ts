@@ -1,4 +1,4 @@
-import { MtimeOrder, RoleType } from './enums'
+import { CapacityOrder, MtimeOrder, RoleType } from './enums'
 
 export type PickSome<T, K extends keyof T> = {
   [P in keyof Pick<T, K>]?: T[P]
@@ -30,7 +30,7 @@ export interface IUser {
 export interface SearchType {
   offset?: number
   limit?: number
-  order?: MtimeOrder[]
+  order?: MtimeOrder[] | CapacityOrder[]
 }
 
 /**

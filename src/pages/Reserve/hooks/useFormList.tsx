@@ -1,15 +1,18 @@
-import { Field, Radio } from 'react-vant'
+import { Field, Radio, Switch } from 'react-vant'
 import { FormItemProps } from 'react-vant/es/form'
+import { SwitchProps } from 'react-vant/es/switch'
 
 interface FormListProps {
   startTimeFieldProps?: FormItemProps
   endTimeFieldProps?: FormItemProps
   capacityFieldProps?: FormItemProps
+  isPeriodicFieldProps: SwitchProps
 }
 
 export function useFormList({
   startTimeFieldProps,
-  endTimeFieldProps
+  endTimeFieldProps,
+  isPeriodicFieldProps
 }: FormListProps): FormItemProps[] {
   return [
     {
@@ -86,6 +89,22 @@ export function useFormList({
           <Radio name={1}>有</Radio>
           <Radio name={0}>无</Radio>
         </Radio.Group>
+      )
+    },
+    {
+      name: 'isPeriodic',
+      label: '周期性会议',
+      children: (
+        <Switch
+          size={24}
+          defaultChecked={false}
+          onChange={(checked: boolean) => {
+            console.log(checked)
+            if (isPeriodicFieldProps !== undefined && isPeriodicFieldProps.onChange) {
+              isPeriodicFieldProps.onChange(checked)
+            }
+          }}
+        />
       )
     }
   ]

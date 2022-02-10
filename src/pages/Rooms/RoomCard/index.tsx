@@ -13,6 +13,7 @@ interface Props {
   finished: boolean
   listRef?: React.Ref<ListInstance>
   loadMore: () => Promise<void>
+  onClickByCardHeader?: (item: IRoom) => void
 }
 
 const CardHeader = ({ item, onClick }: {
@@ -54,9 +55,12 @@ const CardContent = ({ item }: {
 
 export default function RoomCard({
   rooms, finished, listRef,
-  loadMore
+  loadMore, onClickByCardHeader
 }: Props) {
   const history = useHistory()
+  const goDetail = (item: IRoom) => {
+    history.push(`/detail/${item._id}`, { room: item })
+  }
   return (
     <List finished={finished} onLoad={loadMore}
       errorText='请求失败，点击重新加载'
@@ -67,9 +71,10 @@ export default function RoomCard({
           key={item._id}
           className={styles.card}
         >
-          <CardHeader item={item}
-            onClick={() => history.push(`/detail/${item._id}`, { room: item })}
-          />
+          {onClickByCardHeader
+            ? <CardHeader item={item} onClick={() => onClickByCardHeader(item)} />
+            : <CardHeader item={item} onClick={() => goDetail(item)} />
+          }
           <CardContent item={item} />
         </Cell.Group>
       ))}

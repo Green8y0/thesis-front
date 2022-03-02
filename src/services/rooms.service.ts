@@ -11,6 +11,7 @@ interface ISearch extends SearchType {
   creatorIds?: string[]
   hasScreen?: boolean
   capacity?: MemberFilter
+  capacityLimit?: number
 }
 /**
  * 会议室可删除信息

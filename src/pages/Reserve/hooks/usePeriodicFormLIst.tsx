@@ -1,21 +1,23 @@
 import { useState } from 'react'
 import { ActionSheet, Cell, DatetimePicker, Popup } from 'react-vant'
-import { FormItemProps } from 'react-vant/es/form'
+import { FormInstance, FormItemProps } from 'react-vant/es/form'
 import dayjs from 'dayjs'
 import { getCurrentWeek } from '@/libs/utils'
 
 interface FormListProps {
   isPeriodic: boolean
   formList: FormItemProps[]
+  form: FormInstance
+  today: Date
 }
 
 export function usePeriodicFormList({
-  isPeriodic, formList
+  isPeriodic, formList, form, today
 }: FormListProps): FormItemProps[] {
   const actions = [
     { name: '每天' },
-    { name: `每周(${getCurrentWeek(new Date())})` },
-    { name: `每月(${new Date().getDate()}日)` }
+    { name: `每周(${getCurrentWeek(today)})` },
+    { name: `每月(${today.getDate()}日)` }
   ]
   const [visible, setVisible] = useState(false)
   const [visibleDate, setVisibleDate] = useState(false)
@@ -40,7 +42,13 @@ export function usePeriodicFormList({
             actions={actions}
             onSelect={(action, index) => {
               // console.log(action, index)
-              action.name && setFrequency(action.name)
+              if (action.name) {
+                setFrequency(action.name)
+                form.setFields([{
+                  name: 'frequency',
+                  value: action.name
+                }])
+              }
               setVisible(false)
             }}
           />
@@ -67,7 +75,7 @@ export function usePeriodicFormList({
           >
             <DatetimePicker
               type='month-day'
-              minDate={new Date()}
+              minDate={today}
               maxDate={new Date(2025, 10, 1)}
               value={new Date()}
               cancelButtonText='清除'
@@ -82,7 +90,12 @@ export function usePeriodicFormList({
               }}
               onConfirm={(value: Date) => {
                 console.log(value)
-                setEndPeriodic(dayjs(value).format('YYYY-MM-DD'))
+                const val = dayjs(value).format('YYYY-MM-DD')
+                setEndPeriodic(val)
+                form.setFields([{
+                  name: 'endPeriodic',
+                  value: val
+                }])
                 setVisibleDate(false)
               }}
               onCancel={() => {

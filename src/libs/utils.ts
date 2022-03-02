@@ -49,3 +49,45 @@ export function getCurrentWeek(date: Date): string {
   }
   return dateStr
 }
+
+/**
+ * 获取指定小时的毫秒数
+ * @param hour 小时
+ * @returns 小时的毫秒数
+ */
+export function getHourOfms(hour: number): number {
+  return hour * 60 * 60 * 1000
+}
+
+/**
+ * 获取开始时间到结束时间的间隔天数
+ * @param begin 开始时间
+ * @param end 结束时间
+ * @returns 间隔天数
+ */
+export function getDayOfInterval(begin: Date, end: Date): number {
+  const beginStamp = begin.getTime()
+  const endStamp = end.getTime()
+  return (endStamp - beginStamp) / getHourOfms(24)
+}
+
+/**
+ * 获取Promise.all的参数
+ * @param func 封装的Promise方法
+ * @param parmas 参数数组
+ * @returns Promise数组
+ */
+export function getDataBind<T>(func: Function, parmas: T[]) {
+  return parmas.map(item => func(item))
+}
+
+/**
+ * 对象数组去重
+ * @param parmas 对象数组
+ * @param key 指定的key
+ * @returns 去重后的对象数组
+ */
+export function unique<T>(parmas: T[], key: keyof T) {
+  const res = new Map()
+  return parmas.filter((item) => !res.has(item[key]) && res.set(item[key], true))
+}

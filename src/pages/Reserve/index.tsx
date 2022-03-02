@@ -12,8 +12,8 @@ import { IRoom, IMeeting } from '@/models/types'
 import { useFormList } from './hooks/useFormList'
 import DateTimeField from '@/components/DateTimeField'
 import { meetingsService, roomsService } from '@/services'
-import { filterSameKey } from '@/libs/utils'
-import { MemberFilter } from '@/models/enums'
+import { filterSameKey, getDataBind, getDayOfInterval, getHourOfms, unique } from '@/libs/utils'
+// import { MemberFilter } from '@/models/enums'
 import RoomCard from '@/pages/Rooms/RoomCard'
 import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
 
@@ -21,6 +21,15 @@ interface IAddMeeting extends
 Pick<IRoom, 'hasScreen' | 'capacity'>,
 Pick<IMeeting, 'topic' | 'startTime' | 'endTime'> {
   dateText: string
+  isPeriodic: boolean
+  /**
+   * 重复频率（每天/周/月）
+   */
+  frequency?: string
+  /**
+   * 结束重复日期
+   */
+  endPeriodic?: string
 }
 
 interface ILocation {
@@ -44,10 +53,12 @@ export default function Reserve() {
   const [rooms, setRooms] = useState<IRoom[]>([])
   // const [total, setTotal] = useState(0)
 
+  // 获取会议信息
   const { run: getMeetings } = useRequest(meetingsService.list, {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
+        console.log('data.data.rows = ', data.data.rows)
         setMeetings(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
         // setTotal(data.data.total)
         // setHasMore(data.data.rows.length >= limit.current)
@@ -58,21 +69,39 @@ export default function Reserve() {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
+        let ids = [] as string[]
+        const mts = unique(meetings, 'roomId')
+        console.log('mts = ', mts, 'meetings = ', meetings)
+        if (mts.length > 0) {
+          // 获取指定的时间段被占用的会议室id
+          ids = mts.map(item => item.roomId)
+          // 过滤被占用的会议室
+          data.data.rows = data.data.rows.filter(item => !ids.includes(item._id))
+        }
         setRooms(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
         // setTotal(data.data.total)
         // setHasMore(data.data.rows.length >= limit.current)
+        return data.data
       }
     }
   })
+  // 预订会议室
   const { run: addMeeting } = useRequest(meetingsService.add, {
     manual: true,
-    onSuccess: data => {
+    onSuccess: (data, params) => {
       if (data.stat === 'OK') {
         Toast.success('预订成功')
-        history.replace('/')
+        const { roomId } = params[0]
+        if (roomId) {
+          history.replace(`/detail/${roomId}`)
+        } else {
+          history.replace('/')
+        }
       }
     }
   })
+
+  // 预订会议表单
   const formList: FormItemProps[] = useFormList({
     startTimeFieldProps: {
       onClick: () => setSTimeVisiable(true)
@@ -85,17 +114,12 @@ export default function Reserve() {
     }
   })
 
-  const getMemberFilter = (val: number) => {
-    if (val <= 20) return MemberFilter.twenty
-    else if (val <= 99) return MemberFilter.ninetyNine
-    return MemberFilter.max
-  }
-
+  // 加载会议室
   const loadMoreRoom = async () => {
     try {
       const val = form.getFieldsValue() as IAddMeeting
       await loadRooms({
-        capacity: getMemberFilter(val.capacity),
+        capacityLimit: val.capacity,
         hasScreen: Boolean(val.hasScreen)
       })
     } catch (error) {
@@ -103,18 +127,43 @@ export default function Reserve() {
     }
   }
 
+  // 预订会议提交按钮
   const onFinish = async (val: IAddMeeting) => {
-    // console.log(val)
-    getMeetings({
-      startTime: new Date(`${val.dateText} ${val.startTime}`).getTime(),
-      endTime: new Date(`${val.dateText} ${val.endTime}`).getTime()
-    })
-    let ids = [] as string[]
-    if (meetings.length > 0) {
-      ids = meetings.map(item => item._id)
+    console.log('val = ', val)
+    let req: Object[] = []
+    if (val.frequency) {
+      // 每天
+      if (val.frequency[1] === '天') {
+        const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
+        const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
+        const len = getDayOfInterval(
+          new Date(`${val.dateText} ${val.startTime}`),
+          new Date(`${val.endPeriodic} ${val.startTime}`)
+        )
+        const hourOfms = getHourOfms(24)
+        for (let index = 0; index <= len; index++) {
+          req = [...req, {
+            startTime: begin + index * hourOfms,
+            endTime: end + index * hourOfms
+          }]
+        }
+      }
+      // TODO：并行调用getMeetings出现最后返回请求的rows覆盖前面返回请求的rows
+      Promise.all(getDataBind(getMeetings, req)).then(values => {
+        console.log('values = ', values)
+      })
+      // getDataBind(getMeetings, req)
+      // req.map(item => getMeetings(item))
+      console.log('req = ', req)
+      // console.log('ret = ', ret)
+    } else {
+      getMeetings({
+        startTime: new Date(`${val.dateText} ${val.startTime}`).getTime(),
+        endTime: new Date(`${val.dateText} ${val.endTime}`).getTime()
+      })
     }
     loadRooms({
-      capacity: getMemberFilter(val.capacity),
+      capacityLimit: val.capacity,
       hasScreen: Boolean(val.hasScreen)
     })
   }
@@ -125,7 +174,7 @@ export default function Reserve() {
         name: changeType,
         value: value
       }])
-      console.log('@', form.getFieldValue('startTime'))
+      // console.log('@', form.getFieldValue('startTime'))
     }
   }
   const filterStartTime = () => {
@@ -143,7 +192,7 @@ export default function Reserve() {
           initialValues: { dateText },
           onFinish
         }}
-        formList={usePeriodicFormList({ isPeriodic, formList })}
+        formList={usePeriodicFormList({ form, isPeriodic, formList, today: new Date(dateText) })}
       />
       <DateTimeField
         popupProps={{

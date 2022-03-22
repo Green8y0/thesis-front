@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ActionSheet, Cell, DatetimePicker, Popup } from 'react-vant'
 import { FormInstance, FormItemProps } from 'react-vant/es/form'
 import dayjs from 'dayjs'
-import { getCurrentWeek } from '@/libs/utils'
+import { getCurrentWeek } from '@/libs/DateUtils'
 
 interface FormListProps {
   isPeriodic: boolean

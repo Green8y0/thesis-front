@@ -24,12 +24,23 @@ export default function Login() {
   const [phoneNum, setPhoneNum] = useState('')
   const [code, setCode] = useState(0)
 
-  const { run: login, loading } = useRequest(userService.login, {
+  const { run: login, loading: loginLoading } = useRequest(userService.login, {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
         Toast.success('登录成功')
         history.push('/')
+      } else {
+        Toast.fail(data.msg)
+      }
+    }
+  })
+
+  const { run: sendSms, loading: smsLoading } = useRequest(userService.sms, {
+    manual: true,
+    onSuccess: data => {
+      if (data.stat === 'OK') {
+        Toast.success('短信验证码发送成功')
       } else {
         Toast.fail(data.msg)
       }
@@ -44,14 +55,14 @@ export default function Login() {
       <ConfigProvider themeVars={themeVars}>
         <Form form={form}
           className={styles.form}
-          onFinish={() => login(phoneNum, code)}
           footer={
             <Button block
               round
               color='#a0d911'
-              loading={loading}
+              loading={loginLoading}
               size='large'
               className={styles.btn}
+              onClick={() => login(form.getFieldValue('phoneNum'), form.getFieldValue('code'))}
             >
               登录
             </Button>
@@ -92,6 +103,8 @@ export default function Login() {
               button={
                 <Button size="small" color='#40a9ff'
                   className={styles['btn-code']}
+                  loading={smsLoading}
+                  onClick={() => sendSms(form.getFieldValue('phoneNum'))}
                 >
                   发送
                 </Button>

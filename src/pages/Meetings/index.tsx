@@ -40,7 +40,7 @@ export default function Meetings() {
 
   const [tabs, setTabs] = useState<ITab[]>([{
     key: 'reserveRoom',
-    value: '预定会议室',
+    value: '预订会议室',
     icon: <Icon name='calendar-o' size='0.5rem' />,
     onClick: () => setVisible(true)
   }])

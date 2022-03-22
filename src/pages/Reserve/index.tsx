@@ -12,7 +12,8 @@ import { IRoom, IMeeting } from '@/models/types'
 import { useFormList } from './hooks/useFormList'
 import DateTimeField from '@/components/DateTimeField'
 import { meetingsService, roomsService } from '@/services'
-import { filterSameKey, getDataBind, getDayOfInterval, getHourOfms, unique } from '@/libs/utils'
+import { filterSameKey, getDataBind, unique } from '@/libs/utils'
+import { Duration, getOnceADay, getOnceAMouth, getOnceAWeek } from '@/libs/DateUtils'
 // import { MemberFilter } from '@/models/enums'
 import RoomCard from '@/pages/Rooms/RoomCard'
 import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
@@ -130,23 +131,39 @@ export default function Reserve() {
   // 预订会议提交按钮
   const onFinish = async (val: IAddMeeting) => {
     console.log('val = ', val)
-    let req: Object[] = []
+    let req: Duration[] = []
     if (val.frequency) {
-      // 每天
+      const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
+      const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
       if (val.frequency[1] === '天') {
-        const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
-        const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
-        const len = getDayOfInterval(
-          new Date(`${val.dateText} ${val.startTime}`),
+        // 每天
+        // const len = getDayOfInterval(
+        //   new Date(`${val.dateText} ${val.startTime}`),
+        //   new Date(`${val.endPeriodic} ${val.startTime}`)
+        // )
+        // const hourOfms = getHourOfms(24)
+        // for (let index = 0; index <= len; index++) {
+        //   req = [...req, {
+        //     startTime: begin + index * hourOfms,
+        //     endTime: end + index * hourOfms
+        //   }]
+        // }
+        req = getOnceADay(
+          { startTime: begin, endTime: end },
           new Date(`${val.endPeriodic} ${val.startTime}`)
         )
-        const hourOfms = getHourOfms(24)
-        for (let index = 0; index <= len; index++) {
-          req = [...req, {
-            startTime: begin + index * hourOfms,
-            endTime: end + index * hourOfms
-          }]
-        }
+      } else if (val.frequency[1] === '周') {
+        // 每周
+        req = getOnceAWeek(
+          { startTime: begin, endTime: end },
+          new Date(`${val.endPeriodic} ${val.startTime}`)
+        )
+      } else if (val.frequency[1] === '月') {
+        // 每月
+        req = getOnceAMouth(
+          { startTime: begin, endTime: end },
+          new Date(`${val.endPeriodic} ${val.startTime}`)
+        )
       }
       // TODO：并行调用getMeetings出现最后返回请求的rows覆盖前面返回请求的rows
       Promise.all(getDataBind(getMeetings, req)).then(values => {

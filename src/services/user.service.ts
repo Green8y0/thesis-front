@@ -53,15 +53,12 @@ export async function logout() {
 }
 
 /**
- * 修改密码
- * @param oldValue
- * @param newValue
+ * 发送登录验证码
  * @returns
  */
-export async function passwd(oldValue: string, newValue: string) {
-  const { data } = await request.post<BaseRes>(PREFIX + '/passwd', {
-    oldValue,
-    newValue
+export async function sms(phoneNum: string) {
+  const { data } = await request.post<BaseRes>(PREFIX + '/sms', {
+    phoneNum
   })
   return data
 }

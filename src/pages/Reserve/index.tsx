@@ -1,22 +1,25 @@
 import { useState, useRef } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useRequest } from 'ahooks'
-import { Form, Dialog, Toast } from 'react-vant'
+import { Form, Dialog, Toast, Button, Popup } from 'react-vant'
 import dayjs from 'dayjs'
 import { FormItemProps } from 'react-vant/es/form'
 import { ListInstance } from 'react-vant/es/list'
 
 import Layout from '@/components/Layout'
 import EditForm from '@/components/EditForm'
-import { IRoom, IMeeting } from '@/models/types'
+import { IRoom, IMeeting, IUser } from '@/models/types'
 import { useFormList } from './hooks/useFormList'
 import DateTimeField from '@/components/DateTimeField'
-import { meetingsService, roomsService } from '@/services'
-import { filterSameKey, getDataBind, unique } from '@/libs/utils'
+import { meetingsService, roomsService, userService } from '@/services'
+import { filterSameKey, getDataBind, getRandom, unique } from '@/libs/utils'
 import { Duration, getOnceADay, getOnceAMouth, getOnceAWeek } from '@/libs/DateUtils'
 // import { MemberFilter } from '@/models/enums'
 import RoomCard from '@/pages/Rooms/RoomCard'
 import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
+import NewIcon from '@/components/Icon/NewIcon'
+import AttendeesPicker from '@/components/AttendeesPicker'
+import styles from './style.module.less'
 
 interface IAddMeeting extends
 Pick<IRoom, 'hasScreen' | 'capacity'>,
@@ -44,27 +47,35 @@ enum TimeType {
 export default function Reserve() {
   const location = useLocation<ILocation>()
   const history = useHistory()
+  const limit = useRef(10)
   const listRef = useRef<ListInstance>(null)
   const [form] = Form.useForm()
+  const [showForm, setShowForm] = useState(true)
   const [dateText] = useState(location.state?.dateText)
   const [sTimeVisiable, setSTimeVisiable] = useState(false)
   const [eTimeVisiable, setETimeVisiable] = useState(false)
+  const [visibleAttendees, setVisibleAttendees] = useState(false)
   const [isPeriodic, setIsPeriodic] = useState(false)
+  const [searchVal, setSearchVal] = useState('')
   const [meetings, setMeetings] = useState<IMeeting[]>([])
   const [rooms, setRooms] = useState<IRoom[]>([])
+  const [users, setUsers] = useState<IUser[]>([])
+  const [finished, setFinished] = useState(false)
+
   // const [total, setTotal] = useState(0)
 
   // 获取会议信息
   const { run: getMeetings } = useRequest(meetingsService.list, {
     manual: true,
-    onSuccess: data => {
+    onSuccess: (data, params) => {
       if (data.stat === 'OK') {
         console.log('data.data.rows = ', data.data.rows)
         setMeetings(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
         // setTotal(data.data.total)
         // setHasMore(data.data.rows.length >= limit.current)
       }
-    }
+    },
+    fetchKey: () => getRandom()
   })
   const { run: loadRooms } = useRequest(roomsService.list, {
     manual: true,
@@ -101,6 +112,15 @@ export default function Reserve() {
       }
     }
   })
+  const { run: getUsers } = useRequest(userService.list, {
+    manual: true,
+    onSuccess: data => {
+      if (data.stat === 'OK') {
+        setUsers(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
+        setFinished(data.data.rows.length < limit.current)
+      }
+    }
+  })
 
   // 预订会议表单
   const formList: FormItemProps[] = useFormList({
@@ -112,6 +132,9 @@ export default function Reserve() {
     },
     isPeriodicFieldProps: {
       onChange: (checked) => setIsPeriodic(checked)
+    },
+    attendeesFieldProps: {
+      onClick: () => setVisibleAttendees(true)
     }
   })
 
@@ -131,23 +154,12 @@ export default function Reserve() {
   // 预订会议提交按钮
   const onFinish = async (val: IAddMeeting) => {
     console.log('val = ', val)
+    setShowForm(false)
     let req: Duration[] = []
     if (val.frequency) {
       const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
       const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
       if (val.frequency[1] === '天') {
-        // 每天
-        // const len = getDayOfInterval(
-        //   new Date(`${val.dateText} ${val.startTime}`),
-        //   new Date(`${val.endPeriodic} ${val.startTime}`)
-        // )
-        // const hourOfms = getHourOfms(24)
-        // for (let index = 0; index <= len; index++) {
-        //   req = [...req, {
-        //     startTime: begin + index * hourOfms,
-        //     endTime: end + index * hourOfms
-        //   }]
-        // }
         req = getOnceADay(
           { startTime: begin, endTime: end },
           new Date(`${val.endPeriodic} ${val.startTime}`)
@@ -165,14 +177,9 @@ export default function Reserve() {
           new Date(`${val.endPeriodic} ${val.startTime}`)
         )
       }
-      // TODO：并行调用getMeetings出现最后返回请求的rows覆盖前面返回请求的rows
       Promise.all(getDataBind(getMeetings, req)).then(values => {
         console.log('values = ', values)
       })
-      // getDataBind(getMeetings, req)
-      // req.map(item => getMeetings(item))
-      console.log('req = ', req)
-      // console.log('ret = ', ret)
     } else {
       getMeetings({
         startTime: new Date(`${val.dateText} ${val.startTime}`).getTime(),
@@ -185,7 +192,6 @@ export default function Reserve() {
     })
   }
   const changeTime = (changeType: TimeType, value: string) => {
-    console.log(value)
     if (changeType) {
       form.setFields([{
         name: changeType,
@@ -197,20 +203,43 @@ export default function Reserve() {
   const filterStartTime = () => {
     return new Date(`${dateText} ${form.getFieldValue('startTime')}`)
   }
+  const refresh = async (fn?: () => void) => {
+    return new Promise(resolve => {
+      setFinished(false)
+      setRooms([])
+      fn && fn()
+      resolve('')
+    }).then(() => {
+      listRef.current?.check()
+    })
+  }
   return (
     <Layout
       showNav={true}
       showTab={false}
       navText='预订会议室'
     >
-      <EditForm
-        formProps={{
-          form,
-          initialValues: { dateText },
-          onFinish
-        }}
-        formList={usePeriodicFormList({ form, isPeriodic, formList, today: new Date(dateText) })}
-      />
+      <Button type='default' round
+        icon={<NewIcon/>}
+        className={styles.btn}
+        shadow={2}
+        onClick={() => setShowForm(true)}
+      ></Button>
+      <Popup
+        visible={showForm}
+        position='top'
+        onClose={() => setShowForm(false)}
+        round
+      >
+        <EditForm
+          formProps={{
+            form,
+            initialValues: { dateText },
+            onFinish
+          }}
+          formList={usePeriodicFormList({ form, isPeriodic, formList, today: new Date(dateText) })}
+        />
+      </Popup>
       <DateTimeField
         popupProps={{
           visible: sTimeVisiable,
@@ -258,6 +287,33 @@ export default function Reserve() {
           onConfirm: (value: string) => {
             setETimeVisiable(false)
             changeTime(TimeType.endTime, value)
+          }
+        }}
+      />
+      <AttendeesPicker
+        popupProps={{
+          visible: visibleAttendees,
+          round: true,
+          position: 'bottom',
+          onClose: () => setVisibleAttendees(false)
+        }}
+        listProps={{
+          finished: finished,
+          onLoad: () => {
+            getUsers({
+              offset: users.length,
+              limit: limit.current
+            })
+          }
+        }}
+        users={users}
+        searchProps={{
+          value: searchVal,
+          onSearch: val => {
+            refresh(() => setSearchVal(val))
+          },
+          onClear: val => {
+            refresh(() => setSearchVal(val))
           }
         }}
       />

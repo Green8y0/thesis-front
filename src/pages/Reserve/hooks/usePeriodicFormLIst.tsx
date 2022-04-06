@@ -89,7 +89,6 @@ export function usePeriodicFormList({
                 return val
               }}
               onConfirm={(value: Date) => {
-                console.log(value)
                 const val = dayjs(value).format('YYYY-MM-DD')
                 setEndPeriodic(val)
                 form.setFields([{

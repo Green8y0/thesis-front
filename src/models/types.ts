@@ -27,6 +27,9 @@ export interface IUser {
   role: RoleType | RoleType[]
 }
 
+/**
+ * offset, limit, order
+ */
 export interface SearchType {
   offset?: number
   limit?: number
@@ -88,4 +91,12 @@ export interface IMeeting {
    * 会议室创建者
    */
   creator: Omit<IUser, 'phoneNum'>
+}
+
+/**
+ * 用户信息列表请求参数
+ */
+export interface IUserListRes extends SearchType {
+  userIds?: string[]
+  phoneNums?: string[]
 }

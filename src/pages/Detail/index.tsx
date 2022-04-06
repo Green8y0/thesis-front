@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import { useRequest } from 'ahooks'
 
 import RoomDetail from './RoomDetail'
-import MeetingRecord from './MeetingRecord'
+import MeetingRecord from '../../components/MeetingRecord'
 import Layout from '@/components/Layout'
 import PullToRefresh from '@/components/PullToRefresh'
 import { IMeeting, IRoom } from '@/models/types'
@@ -39,7 +39,7 @@ export default function Detail() {
       }
     }
   })
-  useRequest(roomsService.list, {
+  useRequest(() => roomsService.list({ roomsIds: [id] }), {
     ready: !!id,
     onSuccess: data => {
       if (data.stat === 'OK' && data.data.rows.length > 0) {

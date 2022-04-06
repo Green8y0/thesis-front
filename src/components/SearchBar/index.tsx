@@ -8,7 +8,7 @@ import styles from './style.module.less'
 
 interface Props {
   value: string
-  setValue: (val: string) => void
+  onSearch: (val: string) => void
   onClear: (val: string) => void
   placeholder?: string
   className?: string
@@ -22,14 +22,14 @@ export default function SearchBar({
   placeholder,
   className,
   value,
-  setValue,
+  onSearch,
   onClear
 }: Props) {
   return (
     <ConfigProvider themeVars={themeVars}>
       <Search
         value={value}
-        onSearch={val => setValue(val)}
+        onSearch={val => onSearch(val)}
         onClear={() => onClear('')}
         clearable={true}
         placeholder={placeholder}

@@ -6,13 +6,15 @@ interface FormListProps {
   startTimeFieldProps?: FormItemProps
   endTimeFieldProps?: FormItemProps
   capacityFieldProps?: FormItemProps
+  attendeesFieldProps?: FormItemProps
   isPeriodicFieldProps: SwitchProps
 }
 
 export function useFormList({
   startTimeFieldProps,
   endTimeFieldProps,
-  isPeriodicFieldProps
+  isPeriodicFieldProps,
+  attendeesFieldProps
 }: FormListProps): FormItemProps[] {
   return [
     {
@@ -33,7 +35,6 @@ export function useFormList({
         <Field
           placeholder='请输入与会人数'
           type='digit'
-          onChange={(val) => console.log(typeof val)}
         />
       )
     },
@@ -92,6 +93,21 @@ export function useFormList({
       )
     },
     {
+      name: 'attendees',
+      label: '与会者',
+      // rules: [
+      //   { required: true }
+      // ],
+      children: (
+        <Field
+          clickable
+          readonly
+          placeholder='请选择会议与会者'
+        />
+      ),
+      ...attendeesFieldProps
+    },
+    {
       name: 'isPeriodic',
       label: '周期性会议',
       children: (
@@ -99,7 +115,6 @@ export function useFormList({
           size={24}
           defaultChecked={false}
           onChange={(checked: boolean) => {
-            console.log(checked)
             if (isPeriodicFieldProps !== undefined && isPeriodicFieldProps.onChange) {
               isPeriodicFieldProps.onChange(checked)
             }

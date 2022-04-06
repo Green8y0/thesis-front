@@ -1,5 +1,5 @@
 import request, { BaseRes } from '../libs/request'
-import { IUser } from '../models/types'
+import { IUser, IUserListRes, ListData, SearchType } from '../models/types'
 import { Canceler } from 'axios'
 
 // API路径前缀
@@ -59,6 +59,27 @@ export async function logout() {
 export async function sms(phoneNum: string) {
   const { data } = await request.post<BaseRes>(PREFIX + '/sms', {
     phoneNum
+  })
+  return data
+}
+
+/**
+ * 获取我的会议信息
+ * @returns
+ */
+export async function meetings(record: SearchType) {
+  const { data } = await request.post<BaseRes>(PREFIX + '/meetings', { ...record })
+  return data
+}
+
+/**
+ * 获取用户信息列表
+ * @param record 用户信息
+ * @returns
+ */
+export async function list(record: IUserListRes) {
+  const { data } = await request.post<BaseRes<ListData<IUser>>>(PREFIX + '/list', {
+    record
   })
   return data
 }

@@ -96,7 +96,7 @@ export default function Rooms() {
         <SearchBar
           placeholder='请输入内容'
           value={searchVal}
-          setValue={val => {
+          onSearch={val => {
             refresh(() => setSearchVal(val))
           }}
           onClear={val => {

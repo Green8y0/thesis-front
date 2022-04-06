@@ -34,3 +34,11 @@ export function unique<T>(parmas: T[], key: keyof T) {
   const res = new Map()
   return parmas.filter((item) => !res.has(item[key]) && res.set(item[key], true))
 }
+
+/**
+ * 获取六位随机数
+ * @returns 六位随机数
+ */
+export function getRandom() {
+  return String(Math.floor(Math.random() * 1000000))
+}

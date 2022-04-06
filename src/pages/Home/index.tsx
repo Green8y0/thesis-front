@@ -2,7 +2,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import Rooms from '../Rooms'
 import Me from '../Me'
-import Meetings from '../Meetings'
+import WorkStation from '../WorkStation'
 import Detail from '../Detail'
 import RoomUpdate from '../EditRoom/Update'
 import Reserve from '../Reserve'
@@ -18,7 +18,7 @@ export default function Home() {
       <main className={styles.body}>
         <Switch>
           <Route path='/me' exact component={Me} />
-          <Route path='/meetings' exact component={Meetings} />
+          <Route path='/work' exact component={WorkStation} />
           <Route path='/room/add' exact component={AddRoom} />
           <Route path='/reserve' exact component={Reserve} />
           <Route path='/detail/:id' component={Detail} />

@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useRequest } from 'ahooks'
 import { Form, Dialog, Toast, Button, Popup } from 'react-vant'
 import dayjs from 'dayjs'
+import isToday from 'dayjs/plugin/isToday'
 import { FormItemProps } from 'react-vant/es/form'
 import { ListInstance } from 'react-vant/es/list'
 
@@ -11,7 +12,7 @@ import EditForm from '@/components/EditForm'
 import { IRoom, IMeeting, IUser } from '@/models/types'
 import { useFormList } from './hooks/useFormList'
 import DateTimeField from '@/components/DateTimeField'
-import { meetingsService, roomsService, userService } from '@/services'
+import { attendeesService, meetingsService, roomsService, userService } from '@/services'
 import { filterSameKey, getDataBind, getRandom, unique } from '@/libs/utils'
 import { Duration, getOnceADay, getOnceAMouth, getOnceAWeek } from '@/libs/DateUtils'
 // import { MemberFilter } from '@/models/enums'
@@ -20,6 +21,8 @@ import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
 import NewIcon from '@/components/Icon/NewIcon'
 import AttendeesPicker from '@/components/AttendeesPicker'
 import styles from './style.module.less'
+
+dayjs.extend(isToday)
 
 interface IAddMeeting extends
 Pick<IRoom, 'hasScreen' | 'capacity'>,
@@ -54,13 +57,14 @@ export default function Reserve() {
   const [dateText] = useState(location.state?.dateText)
   const [sTimeVisiable, setSTimeVisiable] = useState(false)
   const [eTimeVisiable, setETimeVisiable] = useState(false)
-  const [visibleAttendees, setVisibleAttendees] = useState(false)
   const [isPeriodic, setIsPeriodic] = useState(false)
   const [searchVal, setSearchVal] = useState('')
   const [meetings, setMeetings] = useState<IMeeting[]>([])
   const [rooms, setRooms] = useState<IRoom[]>([])
   const [users, setUsers] = useState<IUser[]>([])
   const [finished, setFinished] = useState(false)
+  const [visibleAttendees, setVisibleAttendees] = useState(false)
+  const [attendees, setAttendees] = useState<IUser[]>([])
 
   // const [total, setTotal] = useState(0)
 
@@ -97,14 +101,21 @@ export default function Reserve() {
       }
     }
   })
+  const { run: addAttendees } = useRequest(attendeesService.add, {
+    manual: true,
+    onSuccess: data => {
+    }
+  })
   // 预订会议室
   const { run: addMeeting } = useRequest(meetingsService.add, {
     manual: true,
     onSuccess: (data, params) => {
-      if (data.stat === 'OK') {
+      if (data.stat === 'OK' && location.pathname === '/reserve') {
         Toast.success('预订成功')
+        const meetingId = data.data.meetingId
         const { roomId } = params[0]
-        if (roomId) {
+        if (roomId && meetingId) {
+          addAttendees(meetingId, attendees.map(item => item._id))
           history.replace(`/detail/${roomId}`)
         } else {
           history.replace('/')
@@ -191,6 +202,51 @@ export default function Reserve() {
       hasScreen: Boolean(val.hasScreen)
     })
   }
+  // 选择预约的会议室
+  const selectRoom = (room: IRoom) => {
+    const frequency = form.getFieldValue('frequency') as string
+    const dateText = form.getFieldValue('dateText') as string
+    const startTime = form.getFieldValue('startTime') as string
+    const endTime = form.getFieldValue('endTime') as string
+    const endPeriodic = form.getFieldValue('endPeriodic') as string
+    if (frequency) {
+      let req: Duration[] = []
+      const begin = new Date(`${dateText} ${startTime}`).getTime()
+      const end = new Date(`${dateText} ${endTime}`).getTime()
+      if (frequency[1] === '天') {
+        req = getOnceADay(
+          { startTime: begin, endTime: end },
+          new Date(`${endPeriodic} ${startTime}`)
+        )
+      } else if (frequency[1] === '周') {
+        // 每周
+        req = getOnceAWeek(
+          { startTime: begin, endTime: end },
+          new Date(`${endPeriodic} ${startTime}`)
+        )
+      } else if (frequency[1] === '月') {
+        // 每月
+        req = getOnceAMouth(
+          { startTime: begin, endTime: end },
+          new Date(`${endPeriodic} ${startTime}`)
+        )
+      }
+      const msg = { roomId: room._id, topic: form.getFieldValue('topic') }
+      req.map(item => Object.assign(item, msg))
+      Promise.all(getDataBind(addMeeting, req)).then(values => {
+        console.log('values = ', values)
+      }).catch(reson => {
+        console.log('reson = ', reson)
+      })
+    } else {
+      addMeeting({
+        roomId: room._id,
+        topic: form.getFieldValue('topic'),
+        startTime: new Date(`${dateText} ${form.getFieldValue('startTime')}`).getTime(),
+        endTime: new Date(`${dateText} ${form.getFieldValue('endTime')}`).getTime()
+      })
+    }
+  }
   const changeTime = (changeType: TimeType, value: string) => {
     if (changeType) {
       form.setFields([{
@@ -206,12 +262,26 @@ export default function Reserve() {
   const refresh = async (fn?: () => void) => {
     return new Promise(resolve => {
       setFinished(false)
-      setRooms([])
+      setUsers(attendees)
       fn && fn()
       resolve('')
     }).then(() => {
       listRef.current?.check()
     })
+  }
+  const loadMoreUser = async () => {
+    try {
+      if (searchVal) {
+        await getUsers({ phoneNums: [searchVal] })
+      } else {
+        await getUsers({
+          offset: users.length,
+          limit: limit.current
+        })
+      }
+    } catch (error) {
+      console.trace(error)
+    }
   }
   return (
     <Layout
@@ -250,7 +320,7 @@ export default function Reserve() {
         dateTimePickerProps={{
           title: '请选择开始时间',
           type: 'time',
-          minHour: dayjs().get('hour'),
+          minHour: dayjs(dateText).isToday() ? dayjs().get('hour') : 9,
           maxHour: 21,
           filter: (type, options) => {
             if (type === 'minute') {
@@ -295,16 +365,17 @@ export default function Reserve() {
           visible: visibleAttendees,
           round: true,
           position: 'bottom',
-          onClose: () => setVisibleAttendees(false)
+          onClose: () => {
+            form.setFields([{
+              name: 'attendees',
+              value: attendees.length + '人'
+            }])
+            setVisibleAttendees(false)
+          }
         }}
         listProps={{
           finished: finished,
-          onLoad: () => {
-            getUsers({
-              offset: users.length,
-              limit: limit.current
-            })
-          }
+          onLoad: loadMoreUser
         }}
         users={users}
         searchProps={{
@@ -315,6 +386,10 @@ export default function Reserve() {
           onClear: val => {
             refresh(() => setSearchVal(val))
           }
+        }}
+        checkboxProps={{
+          value: attendees,
+          setValue: (value: IUser[]) => setAttendees(value)
         }}
       />
       {rooms.length > 0 &&
@@ -331,12 +406,7 @@ export default function Reserve() {
               .then(() => {
                 // on confirm
                 console.log('on confirm')
-                addMeeting({
-                  roomId: item._id,
-                  topic: form.getFieldValue('topic'),
-                  startTime: new Date(`${dateText} ${form.getFieldValue('startTime')}`).getTime(),
-                  endTime: new Date(`${dateText} ${form.getFieldValue('endTime')}`).getTime()
-                })
+                selectRoom(item)
               })
               .catch(() => {
                 // on cancel

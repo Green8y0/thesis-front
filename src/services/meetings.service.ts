@@ -11,7 +11,7 @@ interface ISearch extends SearchType {
   endTime?: number
 }
 interface IAddResp {
-  insertedId: string
+  meetingId: string
 }
 
 /**

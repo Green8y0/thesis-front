@@ -36,9 +36,9 @@ export function unique<T>(parmas: T[], key: keyof T) {
 }
 
 /**
- * 获取六位随机数
- * @returns 六位随机数
+ * 获取digit位随机数
+ * @returns digit位随机数,不传参为默认六位数
  */
-export function getRandom() {
-  return String(Math.floor(Math.random() * 1000000))
+export function getRandom(digit: number = 6) {
+  return String(Math.floor(Math.random() * Math.pow(10, digit)))
 }

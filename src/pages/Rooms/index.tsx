@@ -12,6 +12,7 @@ import PullToRefresh from '@/components/PullToRefresh'
 import SearchBar from '@/components/SearchBar'
 import RoomCard from './RoomCard'
 import FiltrateBar from '../../components/FiltrateBar'
+import { filterSameKey } from '@/libs/utils'
 
 const menus: DropdownMenuItemProps[] = [
   {
@@ -55,8 +56,8 @@ export default function Rooms() {
     manual: true,
     onSuccess: data => {
       if (data.stat === 'OK') {
-        setRooms(val => [...val, ...data.data.rows])
         setFinished(data.data.rows.length < limit.current)
+        setRooms(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
       }
     }
   })

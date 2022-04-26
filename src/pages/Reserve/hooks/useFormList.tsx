@@ -95,9 +95,9 @@ export function useFormList({
     {
       name: 'attendees',
       label: '与会者',
-      // rules: [
-      //   { required: true }
-      // ],
+      rules: [
+        { required: true }
+      ],
       children: (
         <Field
           clickable

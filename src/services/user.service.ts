@@ -68,7 +68,7 @@ export async function sms(phoneNum: string) {
  * @returns
  */
 export async function meetings(record: SearchType) {
-  const { data } = await request.post<BaseRes>(PREFIX + '/meetings', { ...record })
+  const { data } = await request.post<BaseRes>(PREFIX + '/meetings', record)
   return data
 }
 
@@ -78,8 +78,6 @@ export async function meetings(record: SearchType) {
  * @returns
  */
 export async function list(record: IUserListRes) {
-  const { data } = await request.post<BaseRes<ListData<IUser>>>(PREFIX + '/list', {
-    record
-  })
+  const { data } = await request.post<BaseRes<ListData<IUser>>>(PREFIX + '/list', record)
   return data
 }

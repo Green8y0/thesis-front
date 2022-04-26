@@ -100,3 +100,9 @@ export interface IUserListRes extends SearchType {
   userIds?: string[]
   phoneNums?: string[]
 }
+
+export interface IAttendees {
+  _id: string
+  meetingId: string
+  attendeeIds: string
+}

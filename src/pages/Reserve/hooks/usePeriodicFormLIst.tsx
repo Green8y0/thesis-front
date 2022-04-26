@@ -16,8 +16,8 @@ export function usePeriodicFormList({
 }: FormListProps): FormItemProps[] {
   const actions = [
     { name: '每天' },
-    { name: `每周(${getCurrentWeek(today)})` },
-    { name: `每月(${today.getDate()}日)` }
+    { name: `每周(${getCurrentWeek(today)})` }
+    // { name: `每月(${today.getDate()}日)` }
   ]
   const [visible, setVisible] = useState(false)
   const [visibleDate, setVisibleDate] = useState(false)

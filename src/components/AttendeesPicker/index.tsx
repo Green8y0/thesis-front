@@ -4,8 +4,10 @@ import { ListProps, ListInstance } from 'react-vant/es/list'
 import { PopupProps } from 'react-vant/es/popup'
 // import { SearchProps } from 'react-vant/es/search'
 import SearchBar from '@/components/SearchBar'
-import UserPicker from './UserPicker'
+import UserPicker, { CheckboxProps } from './UserPicker'
 import { IUser } from '@/models/types'
+
+import styles from './style.module.less'
 
 interface SearchProps {
   value: string
@@ -19,13 +21,16 @@ interface AttendeesPickerProps {
   popupProps: PopupProps
   listProps: ListProps
   searchProps: SearchProps
+  checkboxProps: CheckboxProps
   users: IUser[]
 }
 
 export default function AttendeesPicker({
   popupProps,
   listProps,
-  searchProps
+  searchProps,
+  checkboxProps,
+  users
 }: AttendeesPickerProps) {
   const listRef = useRef<ListInstance>(null)
   return (
@@ -33,6 +38,7 @@ export default function AttendeesPicker({
       {...popupProps}
       round
       position='bottom'
+      className={styles.popup}
     >
       <Sticky>
         <SearchBar
@@ -41,6 +47,8 @@ export default function AttendeesPicker({
         />
       </Sticky>
       <UserPicker
+        users={users}
+        checkboxProps={checkboxProps}
         listProps={listProps}
         listRef={listRef}
       />

@@ -3,6 +3,10 @@ import { CapacityOrder, MtimeOrder, RoleType } from './enums'
 export type PickSome<T, K extends keyof T> = {
   [P in keyof Pick<T, K>]?: T[P]
 }
+export interface IObj<K, V> {
+  key: K,
+  val: V
+}
 export interface ListData<T> {
   rows: T[]
   total: number

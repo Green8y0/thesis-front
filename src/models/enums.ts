@@ -116,3 +116,30 @@ export enum DataStatus {
    */
   deleted = 1
 }
+
+export enum IFrequency {
+  /**
+   * 每天
+   */
+  day = 'day',
+  /**
+   * 每周
+   */
+  week = 'week'
+}
+
+export enum IKeyofDay {
+  morning = 'morning',
+  nooning = 'nooning',
+  afternoon = 'afternoon',
+  evening = 'evening'
+}
+export enum IKeyofWeek {
+  Monday = 'Monday', // 周一的会议次数
+  Tuesday = 'Tuesday', // 周二的会议次数
+  Wednesday = 'Wednesday',
+  Thursday = 'Thursday',
+  Friday = 'Friday',
+  Saturday = 'Saturday',
+  Sunday = 'Sunday'
+}

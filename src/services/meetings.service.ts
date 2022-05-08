@@ -1,5 +1,6 @@
+import { DataStatus, IFrequency, IKeyofDay, IKeyofWeek } from '@/models/enums'
 import request, { BaseRes } from '../libs/request'
-import { SearchType, IMeeting, ListData } from '../models/types'
+import { SearchType, IMeeting, ListData, IObj } from '../models/types'
 
 // API路径前缀
 const PREFIX = '/api/v1/meetings'
@@ -12,6 +13,25 @@ interface ISearch extends SearchType {
 }
 interface IAddResp {
   meetingId: string
+}
+interface ISuggestionRes extends SearchType, Pick<IMeeting, 'startTime' | 'endTime'> {
+  /**
+   * 会议重复频率
+   */
+  frequency: IFrequency,
+  /**
+   * 重复频率结束日期戳
+   */
+  endPeriodic: number
+  status?: DataStatus
+}
+
+export interface ISuggestionResp {
+  suggestion: string
+  sorted: {
+    day: IObj<IKeyofDay, number>[],
+    week?: IObj<IKeyofWeek, number>[]
+  }
 }
 
 /**
@@ -43,6 +63,18 @@ export async function add(props: {
 }) {
   const { data } = await request.post<BaseRes<IAddResp>>(
     `${PREFIX}/add`, props
+  )
+  return data
+}
+
+/**
+ * 获取周期性时间推荐
+ * @param props 见接口文档
+ * @returns 建议与排序对象数组
+ */
+export async function suggest(props: ISuggestionRes) {
+  const { data } = await request.post<BaseRes<ISuggestionResp>>(
+    `${PREFIX}/suggest`, props
   )
   return data
 }

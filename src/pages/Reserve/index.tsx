@@ -14,7 +14,7 @@ import { useFormList } from './hooks/useFormList'
 import DateTimeField from '@/components/DateTimeField'
 import { attendeesService, meetingsService, roomsService, userService } from '@/services'
 import { filterSameKey, getDataBind, getRandom, unique } from '@/libs/utils'
-import { Duration, getOnceADay, getOnceAMouth, getOnceAWeek } from '@/libs/DateUtils'
+import { Duration, getOnceADay, getOnceAWeek } from '@/libs/DateUtils'
 // import { MemberFilter } from '@/models/enums'
 import RoomCard from '@/pages/Rooms/RoomCard'
 import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
@@ -45,6 +45,33 @@ interface ILocation {
 enum TimeType {
   startTime = 'startTime',
   endTime = 'endTime'
+}
+/**
+ * 获取周期性会议的startTime和endTime的数组
+ * @param frequency 周期频率
+ * @param begin 会议开始时间戳（MM-DD HH:SS）
+ * @param end 会议结束时间戳（MM-DD HH:SS）
+ * @param endPeriodic 结束重复日期时间戳
+ * @param startTime 会议开始时间戳（HH:SS）
+ * @returns Duration[]
+ */
+const getDuration = (
+  frequency: string,
+  begin: number, end: number,
+  endPeriodic: string, startTime: number
+) => {
+  if (frequency[1] === '天') {
+    return getOnceADay(
+      { startTime: begin, endTime: end },
+      new Date(`${endPeriodic} ${startTime}`)
+    ) || []
+  } else if (frequency[1] === '周') {
+    // 每周
+    return getOnceAWeek(
+      { startTime: begin, endTime: end },
+      new Date(`${endPeriodic} ${startTime}`)
+    ) || []
+  }
 }
 
 export default function Reserve() {
@@ -102,9 +129,7 @@ export default function Reserve() {
     }
   })
   const { run: addAttendees } = useRequest(attendeesService.add, {
-    manual: true,
-    onSuccess: data => {
-    }
+    manual: true
   })
   // 预订会议室
   const { run: addMeeting } = useRequest(meetingsService.add, {
@@ -167,34 +192,35 @@ export default function Reserve() {
     console.log('val = ', val)
     setShowForm(false)
     let req: Duration[] = []
+    const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
+    const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
     if (val.frequency) {
-      const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
-      const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
-      if (val.frequency[1] === '天') {
-        req = getOnceADay(
-          { startTime: begin, endTime: end },
-          new Date(`${val.endPeriodic} ${val.startTime}`)
-        )
-      } else if (val.frequency[1] === '周') {
-        // 每周
-        req = getOnceAWeek(
-          { startTime: begin, endTime: end },
-          new Date(`${val.endPeriodic} ${val.startTime}`)
-        )
-      } else if (val.frequency[1] === '月') {
-        // 每月
-        req = getOnceAMouth(
-          { startTime: begin, endTime: end },
-          new Date(`${val.endPeriodic} ${val.startTime}`)
-        )
-      }
+      // if (val.frequency[1] === '天') {
+      //   req = getOnceADay(
+      //     { startTime: begin, endTime: end },
+      //     new Date(`${val.endPeriodic} ${val.startTime}`)
+      //   )
+      // } else if (val.frequency[1] === '周') {
+      //   // 每周
+      //   req = getOnceAWeek(
+      //     { startTime: begin, endTime: end },
+      //     new Date(`${val.endPeriodic} ${val.startTime}`)
+      //   )
+      // }
+      req = getDuration(
+        val.frequency,
+        begin,
+        end,
+        val.endPeriodic as string,
+        val.startTime
+      ) || []
       Promise.all(getDataBind(getMeetings, req)).then(values => {
         console.log('values = ', values)
       })
     } else {
       getMeetings({
-        startTime: new Date(`${val.dateText} ${val.startTime}`).getTime(),
-        endTime: new Date(`${val.dateText} ${val.endTime}`).getTime()
+        startTime: begin,
+        endTime: end
       })
     }
     loadRooms({
@@ -209,28 +235,31 @@ export default function Reserve() {
     const startTime = form.getFieldValue('startTime') as string
     const endTime = form.getFieldValue('endTime') as string
     const endPeriodic = form.getFieldValue('endPeriodic') as string
+    const begin = new Date(`${dateText} ${startTime}`).getTime()
+    const end = new Date(`${dateText} ${endTime}`).getTime()
     if (frequency) {
-      let req: Duration[] = []
-      const begin = new Date(`${dateText} ${startTime}`).getTime()
-      const end = new Date(`${dateText} ${endTime}`).getTime()
-      if (frequency[1] === '天') {
-        req = getOnceADay(
-          { startTime: begin, endTime: end },
-          new Date(`${endPeriodic} ${startTime}`)
-        )
-      } else if (frequency[1] === '周') {
-        // 每周
-        req = getOnceAWeek(
-          { startTime: begin, endTime: end },
-          new Date(`${endPeriodic} ${startTime}`)
-        )
-      } else if (frequency[1] === '月') {
-        // 每月
-        req = getOnceAMouth(
-          { startTime: begin, endTime: end },
-          new Date(`${endPeriodic} ${startTime}`)
-        )
-      }
+      // let req: Duration[] = []
+      // const begin = new Date(`${dateText} ${startTime}`).getTime()
+      // const end = new Date(`${dateText} ${endTime}`).getTime()
+      // if (frequency[1] === '天') {
+      //   req = getOnceADay(
+      //     { startTime: begin, endTime: end },
+      //     new Date(`${endPeriodic} ${startTime}`)
+      //   )
+      // } else if (frequency[1] === '周') {
+      //   // 每周
+      //   req = getOnceAWeek(
+      //     { startTime: begin, endTime: end },
+      //     new Date(`${endPeriodic} ${startTime}`)
+      //   )
+      // }
+      const req = getDuration(
+        frequency,
+        begin,
+        end,
+        endPeriodic,
+        new Date(startTime).getTime()
+      ) || []
       const msg = { roomId: room._id, topic: form.getFieldValue('topic') }
       req.map(item => Object.assign(item, msg))
       Promise.all(getDataBind(addMeeting, req)).then(values => {
@@ -242,8 +271,8 @@ export default function Reserve() {
       addMeeting({
         roomId: room._id,
         topic: form.getFieldValue('topic'),
-        startTime: new Date(`${dateText} ${form.getFieldValue('startTime')}`).getTime(),
-        endTime: new Date(`${dateText} ${form.getFieldValue('endTime')}`).getTime()
+        startTime: begin,
+        endTime: end
       })
     }
   }

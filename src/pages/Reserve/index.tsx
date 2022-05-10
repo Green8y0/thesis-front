@@ -20,6 +20,7 @@ import RoomCard from '@/pages/Rooms/RoomCard'
 import { usePeriodicFormList } from './hooks/usePeriodicFormLIst'
 import NewIcon from '@/components/Icon/NewIcon'
 import AttendeesPicker from '@/components/AttendeesPicker'
+import { IFrequency } from '@/models/enums'
 import styles from './style.module.less'
 
 dayjs.extend(isToday)
@@ -95,6 +96,25 @@ export default function Reserve() {
 
   // const [total, setTotal] = useState(0)
 
+  const { run: getSuggestion } = useRequest(meetingsService.suggest, {
+    manual: true,
+    onSuccess: async (data) => {
+      if (data.stat === 'OK') {
+        const { suggestion } = data.data
+        try {
+          await Dialog.alert({
+            title: '当前时间段无空闲会议室',
+            message: suggestion,
+            onClose: () => {
+              setShowForm(true)
+            }
+          })
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    }
+  })
   // 获取会议信息
   const { run: getMeetings } = useRequest(meetingsService.list, {
     manual: true,
@@ -120,6 +140,19 @@ export default function Reserve() {
           ids = mts.map(item => item.roomId)
           // 过滤被占用的会议室
           data.data.rows = data.data.rows.filter(item => !ids.includes(item._id))
+        }
+        if ([...rooms, ...filterSameKey(data.data.rows, rooms, '_id')].length === 0) {
+          const frequency = form.getFieldValue('frequency') as string
+          const dateText = form.getFieldValue('dateText') as string
+          const startTime = form.getFieldValue('startTime') as string
+          const endTime = form.getFieldValue('endTime') as string
+          const endPeriodic = form.getFieldValue('endPeriodic') as string
+          getSuggestion({
+            startTime: new Date(`${dateText} ${startTime}`).getTime(),
+            endTime: new Date(`${dateText} ${endTime}`).getTime(),
+            frequency: frequency === '每周' ? IFrequency.week : IFrequency.day,
+            endPeriodic: new Date(`${endPeriodic} 23:00`).getTime()
+          })
         }
         setRooms(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
         // setTotal(data.data.total)
@@ -195,18 +228,6 @@ export default function Reserve() {
     const begin = new Date(`${val.dateText} ${val.startTime}`).getTime()
     const end = new Date(`${val.dateText} ${val.endTime}`).getTime()
     if (val.frequency) {
-      // if (val.frequency[1] === '天') {
-      //   req = getOnceADay(
-      //     { startTime: begin, endTime: end },
-      //     new Date(`${val.endPeriodic} ${val.startTime}`)
-      //   )
-      // } else if (val.frequency[1] === '周') {
-      //   // 每周
-      //   req = getOnceAWeek(
-      //     { startTime: begin, endTime: end },
-      //     new Date(`${val.endPeriodic} ${val.startTime}`)
-      //   )
-      // }
       req = getDuration(
         val.frequency,
         begin,
@@ -238,21 +259,6 @@ export default function Reserve() {
     const begin = new Date(`${dateText} ${startTime}`).getTime()
     const end = new Date(`${dateText} ${endTime}`).getTime()
     if (frequency) {
-      // let req: Duration[] = []
-      // const begin = new Date(`${dateText} ${startTime}`).getTime()
-      // const end = new Date(`${dateText} ${endTime}`).getTime()
-      // if (frequency[1] === '天') {
-      //   req = getOnceADay(
-      //     { startTime: begin, endTime: end },
-      //     new Date(`${endPeriodic} ${startTime}`)
-      //   )
-      // } else if (frequency[1] === '周') {
-      //   // 每周
-      //   req = getOnceAWeek(
-      //     { startTime: begin, endTime: end },
-      //     new Date(`${endPeriodic} ${startTime}`)
-      //   )
-      // }
       const req = getDuration(
         frequency,
         begin,

@@ -27,7 +27,7 @@ dayjs.extend(isToday)
 
 interface IAddMeeting extends
 Pick<IRoom, 'hasScreen' | 'capacity'>,
-Pick<IMeeting, 'topic' | 'startTime' | 'endTime'> {
+Pick<IMeeting, 'topic'> {
   dateText: string
   isPeriodic: boolean
   /**
@@ -38,6 +38,8 @@ Pick<IMeeting, 'topic' | 'startTime' | 'endTime'> {
    * 结束重复日期
    */
   endPeriodic?: string
+  startTime: string
+  endTime: string
 }
 
 interface ILocation {
@@ -59,7 +61,7 @@ enum TimeType {
 const getDuration = (
   frequency: string,
   begin: number, end: number,
-  endPeriodic: string, startTime: number
+  endPeriodic: string, startTime: string
 ) => {
   if (frequency[1] === '天') {
     return getOnceADay(
@@ -120,7 +122,7 @@ export default function Reserve() {
     manual: true,
     onSuccess: (data, params) => {
       if (data.stat === 'OK') {
-        console.log('data.data.rows = ', data.data.rows)
+        // console.log('data.data.rows = ', data.data.rows)
         setMeetings(val => [...val, ...filterSameKey(data.data.rows, val, '_id')])
         // setTotal(data.data.total)
         // setHasMore(data.data.rows.length >= limit.current)
@@ -134,7 +136,7 @@ export default function Reserve() {
       if (data.stat === 'OK') {
         let ids = [] as string[]
         const mts = unique(meetings, 'roomId')
-        console.log('mts = ', mts, 'meetings = ', meetings)
+        // console.log('mts = ', mts, 'meetings = ', meetings)
         if (mts.length > 0) {
           // 获取指定的时间段被占用的会议室id
           ids = mts.map(item => item.roomId)
@@ -179,7 +181,8 @@ export default function Reserve() {
           history.replace('/')
         }
       }
-    }
+    },
+    fetchKey: () => getRandom()
   })
   const { run: getUsers } = useRequest(userService.list, {
     manual: true,
@@ -236,7 +239,7 @@ export default function Reserve() {
         val.startTime
       ) || []
       Promise.all(getDataBind(getMeetings, req)).then(values => {
-        console.log('values = ', values)
+        // console.log('values = ', values)
       })
     } else {
       getMeetings({
@@ -264,10 +267,12 @@ export default function Reserve() {
         begin,
         end,
         endPeriodic,
-        new Date(startTime).getTime()
+        startTime
       ) || []
+      console.log('line 270 req = ', req)
       const msg = { roomId: room._id, topic: form.getFieldValue('topic') }
       req.map(item => Object.assign(item, msg))
+      console.log('@@@@@@@@ req = ', req)
       Promise.all(getDataBind(addMeeting, req)).then(values => {
         console.log('values = ', values)
       }).catch(reson => {

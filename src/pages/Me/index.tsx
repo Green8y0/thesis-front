@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useRequest } from 'ahooks'
+import { ActionSheet, Dialog, Icon, NavBar, Toast } from 'react-vant'
+import { ActionSheetProps } from 'react-vant/es/action-sheet'
 
 import Layout from '@/components/Layout'
 import UserCard from './UserCard'
@@ -12,6 +14,41 @@ import styles from './style.module.less'
 import PullToRefresh from '@/components/PullToRefresh'
 import MeetingRecord from '@/components/MeetingRecord'
 
+function Menu(props: ActionSheetProps) {
+  const history = useHistory()
+  const actions = [{ name: '退出登录' }]
+
+  const { run: logout } = useRequest(userService.logout, {
+    manual: true,
+    onSuccess: data => {
+      if (data.stat === 'OK') {
+        Toast.success('退出登录')
+        history.replace('/')
+      }
+    }
+  })
+
+  return (
+    <ActionSheet
+      cancelText='取消'
+      actions={actions}
+      onSelect={(item, index) => {
+        if (index === 0) {
+          Dialog.confirm({
+            message: '是否退出登录'
+          }).then(() => {
+            // on confirm
+            logout()
+          }).catch(() => {
+            // on cancel
+          })
+        }
+      }}
+      {...props}
+    />
+  )
+}
+
 export default function Me() {
   const history = useHistory()
   const limit = useRef(10)
@@ -20,6 +57,7 @@ export default function Me() {
   const [user, setUser] = useState<IUser>()
   const [meetings, setMeetings] = useState<IMeeting[]>([])
   const [sort, setSort] = useState(MtimeOrder.desc)
+  const [visible, setVisible] = useState(false)
   useRequest(userService.info, {
     onSuccess: data => {
       if (data.stat !== 'OK') {
@@ -57,6 +95,11 @@ export default function Me() {
       showNav={false}
       showTab={true}
     >
+      <NavBar
+        title='个人中心'
+        rightText={<Icon name='ellipsis'/>}
+        onClickRight={() => setVisible(true)}
+      />
       <div className={styles.wrap}>
         <UserCard
           user={user}
@@ -81,6 +124,7 @@ export default function Me() {
           }}
         />
       </PullToRefresh>
+      <Menu visible={visible} onCancel={() => setVisible(false)} />
     </Layout>
   )
 }

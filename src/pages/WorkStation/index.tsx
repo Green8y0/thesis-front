@@ -36,6 +36,11 @@ export default function Meetings() {
     value: '新增会议室',
     icon: <Icon name='cluster-o' size='0.5rem' />,
     onClick: () => history.push('/room/add')
+  }, {
+    key: 'editRoles',
+    value: '权限修改',
+    icon: <Icon name='setting-o' size='0.5rem' />,
+    onClick: () => history.push('/roles')
   }]
 
   const [tabs, setTabs] = useState<ITab[]>([{
@@ -48,8 +53,15 @@ export default function Meetings() {
   // 根据用户权限设置是否可新增会议室
   useRequest(userService.info, {
     onSuccess: data => {
-      if (data.stat === 'OK' && data.data.role !== RoleType.common) {
-        setTabs(val => [...val, ...filterSameKey(extraTabs, val, 'key')])
+      if (data.stat === 'OK') {
+        const role = data.data.role[0] as RoleType
+        // admin和console均可添加会议室
+        if (role === RoleType.admin) {
+          setTabs(val => [...val, ...filterSameKey([extraTabs[0]], val, 'key')])
+        } else if (role === RoleType.console) {
+          // 仅console可修改权限
+          setTabs(val => [...val, ...filterSameKey(extraTabs, val, 'key')])
+        }
       }
     }
   })

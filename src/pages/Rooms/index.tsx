@@ -95,7 +95,7 @@ export default function Rooms() {
     >
       <Sticky>
         <SearchBar
-          placeholder='请输入内容'
+          placeholder='请输入会议室名称'
           value={searchVal}
           onSearch={val => {
             refresh(() => setSearchVal(val))

@@ -20,6 +20,11 @@ export enum RoleType {
    */
   console = 'console'
 }
+export enum RoleTypeZhCN {
+  common = '普通用户',
+  admin = '管理员',
+  console = '系统管理员'
+}
 
 /**
  * 显示屏筛选

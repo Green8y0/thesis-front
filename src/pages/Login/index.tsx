@@ -97,7 +97,7 @@ export default function Login() {
               value={code ? code.toString() : ''}
               center
               clearable
-              placeholder="请输入短信验证码"
+              placeholder='请输入短信验证码'
               type='digit'
               onChange={(val) => setCode(parseInt(val))}
               button={
